@@ -9,8 +9,25 @@ type thread_id = int with sexp
 let current_thread = ref (-1)
 
 module Event = struct
+  type thread_type = Lwt_tracing.thread_type
+
+  let sexp_of_thread_type t =
+    let open Lwt_tracing in
+    Sexplib.Sexp.Atom begin match t with
+    | Wait -> "Wait"
+    | Task -> "Task"
+    | Bind -> "Bind"
+    | Try -> "Try"
+    | Choose -> "Choose"
+    | Pick -> "Pick"
+    | Join -> "Join"
+    | Map -> "Map"
+    end
+
+  let thread_type_of_sexp _ = assert false
+
   type op = 
-    | Creates of thread_id * thread_id
+    | Creates of thread_id * thread_id * thread_type
     | Reads of thread_id * thread_id
     | Resolves of thread_id * thread_id * string option
     | Becomes of thread_id * thread_id
@@ -18,8 +35,14 @@ module Event = struct
     | Switch of thread_id
     with sexp
 
+  type time = float
+
+  (* sexp_of_float uses strtod which we don't have yet on Xen. *)
+  let sexp_of_time f = Printf.sprintf "%f" f |> sexp_of_string
+  let time_of_sexp _ = assert false
+
   type t = {
-    time : float;
+    time : time;
     op : op;
   } with sexp
 end
@@ -33,8 +56,8 @@ module Log = struct
     let time = timestamp () in
     event_log := {time; op} :: !event_log
 
-  let note_created child =
-    Creates (!current_thread, child) |> record
+  let note_created child thread_type =
+    Creates (!current_thread, child, thread_type) |> record
 
   let note_read input =
     current_thread := Lwt.current_id ();
