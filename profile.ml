@@ -26,6 +26,12 @@ module Event = struct
 
   let thread_type_of_sexp _ = assert false
 
+  type time = float
+
+  (* sexp_of_float uses strtod which we don't have yet on Xen. *)
+  let sexp_of_time f = Printf.sprintf "%f" f |> sexp_of_string
+  let time_of_sexp _ = assert false
+
   type op = 
     | Creates of thread_id * thread_id * thread_type
     | Reads of thread_id * thread_id
@@ -33,13 +39,8 @@ module Event = struct
     | Becomes of thread_id * thread_id
     | Label of thread_id * string
     | Switch of thread_id
+    | Gc of time
     with sexp
-
-  type time = float
-
-  (* sexp_of_float uses strtod which we don't have yet on Xen. *)
-  let sexp_of_time f = Printf.sprintf "%f" f |> sexp_of_string
-  let time_of_sexp _ = assert false
 
   type t = {
     time : time;
@@ -88,6 +89,9 @@ module Log = struct
     current_thread := (-1);
     Switch (-1) |> record
 
+  let note_gc duration =
+    Gc duration |> record
+
   let () =
     Lwt_tracing.tracer := { Lwt_tracing.
       note_created;
@@ -98,6 +102,7 @@ module Log = struct
       note_switch;
       note_suspend;
     };
+    Callback.register "Profile.note_gc" note_gc;
     note_switch ()
 end
 
