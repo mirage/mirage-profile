@@ -22,6 +22,7 @@ module Event = struct
     | Pick -> "Pick"
     | Join -> "Join"
     | Map -> "Map"
+    | Condition -> "Condition"
     end
 
   let thread_type_of_sexp _ = assert false
