@@ -19,3 +19,6 @@ val to_string : event -> string
 
 val label : ?thread:_ Lwt.t -> string -> unit
 (** Attach a label/comment to the given thread (or to the currently executing thread if none is given). *)
+
+val note_increase : string -> int -> unit
+(** [incr name amount] increases the named counter. *)

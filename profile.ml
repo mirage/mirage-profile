@@ -41,6 +41,7 @@ module Event = struct
     | Label of thread_id * string
     | Switch of thread_id
     | Gc of time
+    | Increases of thread_id * string * int
     with sexp
 
   type t = {
@@ -96,6 +97,9 @@ module Log = struct
 
   let note_label log thread label =
     Label (thread, label) |> record log
+
+  let note_increase log counter amount =
+    Increases (!current_thread, counter, amount) |> record log
 
   let note_switch log () =
     let id = Lwt.current_id () in
@@ -181,3 +185,8 @@ let note_resume () =
   match !Log.event_log with
   | None -> ()
   | Some log -> Log.note_switch log ()
+
+let note_increase counter amount =
+  match !Log.event_log with
+  | None -> ()
+  | Some log -> Log.note_increase log counter amount
