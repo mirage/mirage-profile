@@ -1,0 +1,11 @@
+# include assemblage package for editor assistance in assemble.ml
+PKG assemblage
+
+EXT sexplib.syntax
+
+PKG sexplib
+PKG lwt
+
+B _build/lib-mirage-profile
+
+S 
