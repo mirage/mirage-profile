@@ -190,3 +190,6 @@ let note_increase counter amount =
   match !Log.event_log with
   | None -> ()
   | Some log -> Log.note_increase log counter amount
+
+let named_condition label =
+  Lwt_condition.create ~label ()

@@ -22,3 +22,6 @@ val label : ?thread:_ Lwt.t -> string -> unit
 
 val note_increase : string -> int -> unit
 (** [incr name amount] increases the named counter. *)
+
+val named_condition : string -> 'a Lwt_condition.t
+(** Create a Lwt_condition that will label its thread with the given name. *)
