@@ -30,7 +30,7 @@ module Event = struct
   type time = float
 
   (* sexp_of_float uses strtod which we don't have yet on Xen. *)
-  let sexp_of_time f = Printf.sprintf "%f" f |> sexp_of_string
+  let sexp_of_time f = Printf.sprintf "%.15f" f |> sexp_of_string
   let time_of_sexp _ = assert false
 
   type op = 
