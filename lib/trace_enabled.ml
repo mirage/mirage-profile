@@ -1,5 +1,7 @@
 (* Copyright (C) 2014, Thomas Leonard *)
 
+(** This is the [Trace] module when we're compiled with tracing support. *)
+
 open Sexplib.Std
 
 external timestamp : unit -> float = "unix_gettimeofday"
@@ -136,45 +138,42 @@ module Log = struct
     note_switch log ()
 
   let () =
-    Callback.register "Profile.note_gc" note_gc
+    Callback.register "MProf.Trace.note_gc" note_gc
 end
 
-type event = Event.t
+module Control = struct
+  type event = Event.t
 
-let events () =
-  let open Log in
-  match !event_log with
-  | None -> failwith "no event log!"
-  | Some event_log ->
-      let first_event = if event_log.did_loop then event_log.last_event + 1 else 0 in
-      let ring_size = Array.length event_log.log in
-      let n_events = if event_log.did_loop then ring_size else event_log.last_event + 1 in
-      Array.init n_events (fun i ->
-        let i = i + first_event in
-        let i = if i >= ring_size then i - ring_size else i in
-        event_log.log.(i)
-      )
+  let events () =
+    let open Log in
+    match !event_log with
+    | None -> failwith "no event log!"
+    | Some event_log ->
+        let first_event = if event_log.did_loop then event_log.last_event + 1 else 0 in
+        let ring_size = Array.length event_log.log in
+        let n_events = if event_log.did_loop then ring_size else event_log.last_event + 1 in
+        Array.init n_events (fun i ->
+          let i = i + first_event in
+          let i = if i >= ring_size then i - ring_size else i in
+          event_log.log.(i)
+        )
 
-let start ~size =
-  Log.start ~size
+  let start ~size =
+    Log.start ~size
 
-let stop () =
-  let trace = events () in
-  Log.stop ();
-  trace
+  let stop () =
+    let trace = events () in
+    Log.stop ();
+    trace
 
-let to_string e = 
-  Event.sexp_of_t e |> Sexplib.Sexp.to_string
+  let to_string e =
+    Event.sexp_of_t e |> Sexplib.Sexp.to_string
+end
 
-let label ?thread name =
+let label name =
   match !Log.event_log with
   | None -> ()
-  | Some log ->
-      let tid =
-        match thread with
-        | None -> Lwt.current_id ()
-        | Some t -> Lwt.id_of_thread t in
-      Log.note_label log tid name
+  | Some log -> Log.note_label log (Lwt.current_id ()) name
 
 let note_suspend () =
   match !Log.event_log with
@@ -193,3 +192,17 @@ let note_increase counter amount =
 
 let named_condition label =
   Lwt_condition.create ~label ()
+
+let named_wait label =
+  let pair = Lwt.wait () in
+  begin match !Log.event_log with
+  | None -> ()
+  | Some log -> Log.note_label log (Lwt.id_of_thread (fst pair)) label end;
+  pair
+
+let named_task label =
+  let pair = Lwt.task () in
+  begin match !Log.event_log with
+  | None -> ()
+  | Some log -> Log.note_label log (Lwt.id_of_thread (fst pair)) label end;
+  pair

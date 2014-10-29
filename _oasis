@@ -6,8 +6,10 @@ Authors:     Thomas Leonard
 License:     BSD-2-clause
 Plugins:     META (0.4), DevFiles (0.4)
 
-Library "mirage-profile"
-  Path:       lib
-  BuildTools: ocamlbuild
-  Modules:    Profile
+Library "mProf"
+  Path:		lib
+  FindlibName: 	mirage-profile
+  BuildTools: 	ocamlbuild
+  Pack:		true
+  Modules: 	Trace, Counter
   BuildDepends: sexplib,sexplib.syntax,lwt

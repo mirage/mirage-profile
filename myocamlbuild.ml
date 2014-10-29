@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: cc9d288700148bcd27701a2aea92cd57) *)
+(* DO NOT EDIT (digest: f1f29581bd1b44497e8fb426de04cbbf) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -595,7 +595,7 @@ end
 open Ocamlbuild_plugin;;
 let package_default =
   {
-     MyOCamlbuildBase.lib_ocaml = [("mirage-profile", ["lib"], [])];
+     MyOCamlbuildBase.lib_ocaml = [("mProf", ["lib"], [])];
      lib_c = [];
      flags = [];
      includes = []
@@ -606,4 +606,25 @@ let dispatch_default = MyOCamlbuildBase.dispatch_default package_default;;
 
 # 608 "myocamlbuild.ml"
 (* OASIS_STOP *)
-Ocamlbuild_plugin.dispatch dispatch_default;;
+
+let () =
+  Ocamlbuild_plugin.dispatch (fun e ->
+    let use_tracing =
+      match Unix.system("ocamlfind query lwt.tracing > /dev/null 2>&1") with
+      | Unix.WEXITED 0 -> true
+      | Unix.WEXITED _ -> false
+      | _ -> failwith "ocamlfind failed!" in
+    begin match e with
+    | Before_options ->
+        Printf.printf "lwt.tracing available: %b\n" use_tracing;
+        begin try
+          let trace_src =
+            if use_tracing then "lib/trace_enabled.ml"
+            else "lib/trace_stubs.ml" in
+          copy_rule "copy-tracing" trace_src "lib/trace.ml";
+          copy_rule "copy-tracing-mli" (trace_src ^ "i") "lib/trace.mli";
+        with Not_found -> () end
+    | _ -> ()
+    end;
+    dispatch_default e
+  )
