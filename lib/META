@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: 048aa7cfba5338b0b473301055aea34a)
+version = "0.1"
+description = "Record trace data"
+requires = "sexplib sexplib.syntax lwt"
+archive(byte) = "mirage-profile.cma"
+archive(byte, plugin) = "mirage-profile.cma"
+archive(native) = "mirage-profile.cmxa"
+archive(native, plugin) = "mirage-profile.cmxs"
+exists_if = "mirage-profile.cma"
+# OASIS_STOP
+

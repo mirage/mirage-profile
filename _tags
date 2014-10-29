@@ -1,0 +1,21 @@
+# OASIS_START
+# DO NOT EDIT (digest: a8a434130b06f8de9eb31bb053c145dd)
+# Ignore VCS directories, you can use the same kind of rule outside
+# OASIS_START/STOP if you want to exclude directories that contains
+# useless stuff for the build process
+<**/.svn>: -traverse
+<**/.svn>: not_hygienic
+".bzr": -traverse
+".bzr": not_hygienic
+".hg": -traverse
+".hg": not_hygienic
+".git": -traverse
+".git": not_hygienic
+"_darcs": -traverse
+"_darcs": not_hygienic
+# Library mirage-profile
+"lib/mirage-profile.cmxs": use_mirage-profile
+<lib/*.ml{,i}>: pkg_lwt
+<lib/*.ml{,i}>: pkg_sexplib
+<lib/*.ml{,i}>: pkg_sexplib.syntax
+# OASIS_STOP

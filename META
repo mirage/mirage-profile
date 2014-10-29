@@ -1,7 +1,0 @@
-version  = "0.1"
-requires = "sexplib lwt"
-archive(byte) = "mirage-profile.cma"
-archive(byte, plugin) = "mirage-profile.cma"
-archive(native) = "mirage-profile.cmxa"
-archive(native, plugin) = "mirage-profile.cmxs"
-exist_if = "mirage-profile.cma"
