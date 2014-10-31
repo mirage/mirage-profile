@@ -2,63 +2,31 @@
 
 (** This is the [Trace] module when we're compiled with tracing support. *)
 
-open Sexplib.Std
+open Bigarray
 
-external timestamp : unit -> float = "unix_gettimeofday"
+type log_buffer = (char, int8_unsigned_elt, c_layout) Array1.t
 
-type thread_id = int with sexp
+external timestamp : log_buffer -> int -> unit = "stub_mprof_get_monotonic_time"
 
-let current_thread = ref (-1)
+let current_thread = ref (-1L)
 
-module Event = struct
-  type thread_type = Lwt_tracing.thread_type
-
-  let sexp_of_thread_type t =
-    let open Lwt_tracing in
-    Sexplib.Sexp.Atom begin match t with
-    | Wait -> "Wait"
-    | Task -> "Task"
-    | Bind -> "Bind"
-    | Try -> "Try"
-    | Choose -> "Choose"
-    | Pick -> "Pick"
-    | Join -> "Join"
-    | Map -> "Map"
-    | Condition -> "Condition"
-    end
-
-  let thread_type_of_sexp _ = assert false
-
-  type time = float
-
-  (* sexp_of_float uses strtod which we don't have yet on Xen. *)
-  let sexp_of_time f = Printf.sprintf "%.15f" f |> sexp_of_string
-  let time_of_sexp _ = assert false
-
-  type op = 
-    | Creates of thread_id * thread_id * thread_type
-    | Reads of thread_id * thread_id
-    | Resolves of thread_id * thread_id * string option
-    | Becomes of thread_id * thread_id
-    | Label of thread_id * string
-    | Switch of thread_id
-    | Gc of time
-    | Increases of thread_id * string * int
-    with sexp
-
-  type t = {
-    time : time;
-    op : op;
-  } with sexp
-end
+let int_of_thread_type t =
+  let open Lwt_tracing in
+  match t with
+  | Wait -> 0
+  | Task -> 1
+  | Bind -> 2
+  | Try -> 3
+  | Choose -> 4
+  | Pick -> 5
+  | Join -> 6
+  | Map -> 7
+  | Condition -> 8
 
 module Log = struct
-  open Event
-
   type t = {
-    log : Event.t array;
-    mutable last_event : int;
-    mutable did_loop : bool;    (* (first event is at last_event + 1) *)
+    log : log_buffer;
+    mutable next_event : int;
   }
 
   let event_log = ref None
@@ -67,63 +35,134 @@ module Log = struct
     Lwt_tracing.tracer := Lwt_tracing.null_tracer;
     event_log := None
 
-  let record log op =
-    let next_index = log.last_event + 1 in
-    let next_index =
-      if next_index >= Array.length log.log then (
-        log.did_loop <- true;
-        0
-      ) else next_index in
-    log.last_event <- next_index;
-    let time = timestamp () in
-    log.log.(next_index) <- {time; op}
+  let op_creates = 0
+  let op_read = 1
+  let op_fulfills = 2
+  let op_fails = 3
+  let op_becomes = 4
+  let op_label = 5
+  let op_increase = 6
+  let op_switch = 7
+  let op_gc = 8
+
+  let write64 log v i =
+    EndianBigstring.LittleEndian.set_int64 log i v;
+    i + 8
+
+  let write8 log v i =
+    EndianBigstring.LittleEndian.set_int8 log i v;
+    i + 1
+
+  let write_string log v i =
+    let l = String.length v in
+    for idx = 0 to l - 1 do
+      Array1.set log (i + idx) v.[idx]
+    done;
+    Array1.set log (i + l) '\x00';
+    i + l + 1
+
+  let rec add_event log op len =
+    let i = log.next_event in
+    let new_i = i + 9 + len in
+    if new_i > Array1.dim log.log then (
+      log.next_event <- 0;
+      add_event log op len
+    ) else (
+      log.next_event <- new_i;
+      timestamp log.log i;
+      i + 8 |> write8 log.log op
+    )
+
+  (* This is faster than [let end_event = ignore]! *)
+  external end_event : int -> unit = "%ignore"
+(*
+  let end_event i =
+    match !event_log with
+    | None -> assert false
+    | Some log -> assert (i = log.next_event || log.next_event = 0)
+*)
 
   let note_created log child thread_type =
-    Creates (!current_thread, child, thread_type) |> record log
+    add_event log op_creates 17
+    |> write64 log.log !current_thread
+    |> write64 log.log child
+    |> write8  log.log (int_of_thread_type thread_type)
+    |> end_event
 
   let note_read log input =
-    current_thread := Lwt.current_id ();
-    if !current_thread <> input then
-      Reads (!current_thread, input) |> record log
+    let new_current = Lwt.current_id () in
+    (* (avoid expensive caml_modify call if possible) *)
+    if new_current <> !current_thread then current_thread := new_current;
+    if !current_thread <> input then (
+      add_event log op_read 16
+      |> write64 log.log !current_thread
+      |> write64 log.log input
+      |> end_event
+    )
 
   let note_resolved log p ~ex =
-    let msg =
-      match ex with
-      | Some ex -> Some (Printexc.to_string ex)
-      | None -> None in
-    Resolves (!current_thread, p, msg) |> record log
+    match ex with
+    | Some ex ->
+        let msg = Printexc.to_string ex in
+        add_event log op_fails (17 + String.length msg)
+        |> write64 log.log !current_thread
+        |> write64 log.log p
+        |> write_string log.log msg
+        |> end_event
+    | None ->
+        add_event log op_fulfills 16
+        |> write64 log.log !current_thread
+        |> write64 log.log p
+        |> end_event
 
   let note_becomes log input main =
-    if main <> input then
-      Becomes (input, main) |> record log
+    if main <> input then (
+      add_event log op_becomes 16
+      |> write64 log.log input
+      |> write64 log.log main
+      |> end_event
+    )
 
-  let note_label log thread label =
-    Label (thread, label) |> record log
+  let note_label log thread msg =
+    add_event log op_label (9 + String.length msg)
+    |> write64 log.log thread
+    |> write_string log.log msg
+    |> end_event
 
   let note_increase log counter amount =
-    Increases (!current_thread, counter, amount) |> record log
+    add_event log op_increase (17 + String.length counter)
+    |> write64 log.log !current_thread
+    |> write64 log.log (Int64.of_int amount)
+    |> write_string log.log counter
+    |> end_event
 
   let note_switch log () =
     let id = Lwt.current_id () in
     if id <> !current_thread then (
       current_thread := id;
-      Switch id |> record log
+      add_event log op_switch 8
+      |> write64 log.log id
+      |> end_event
     )
 
   let note_suspend log () =
-    current_thread := (-1);
-    Switch (-1) |> record log
+    current_thread := (-1L);
+    add_event log op_switch 8
+    |> write64 log.log (-1L)
+    |> end_event
 
   let note_gc duration =
     match !event_log with
     | None -> ()
-    | Some log -> Gc duration |> record log
+    | Some log ->
+        add_event log op_gc 8
+        |> write64 log.log (duration *. 1000000000. |> Int64.of_float)
+        |> end_event
 
   let start ~size =
     let log = {
-      log = Array.make size {time = 0.0; op = Gc 0.};
-      last_event = -1;
-      did_loop = false;
+      log = Array1.create char c_layout size;
+      next_event = 0;
     } in
     event_log := Some log;
     Lwt_tracing.tracer := { Lwt_tracing.
@@ -142,21 +181,13 @@ module Log = struct
 end
 
 module Control = struct
-  type event = Event.t
-
   let events () =
     let open Log in
     match !event_log with
     | None -> failwith "no event log!"
     | Some event_log ->
-        let first_event = if event_log.did_loop then event_log.last_event + 1 else 0 in
-        let ring_size = Array.length event_log.log in
-        let n_events = if event_log.did_loop then ring_size else event_log.last_event + 1 in
-        Array.init n_events (fun i ->
-          let i = i + first_event in
-          let i = if i >= ring_size then i - ring_size else i in
-          event_log.log.(i)
-        )
+        (* TODO: flag for copy *)
+        Array1.sub event_log.log 0 (event_log.next_event)
 
   let start ~size =
     Log.start ~size
@@ -165,9 +196,6 @@ module Control = struct
     let trace = events () in
     Log.stop ();
     trace
-
-  let to_string e =
-    Event.sexp_of_t e |> Sexplib.Sexp.to_string
 end
 
 let label name =

@@ -1,12 +1,22 @@
 # OASIS_START
-# DO NOT EDIT (digest: 3a660045c378078bb583abcaef7cdb6d)
+# DO NOT EDIT (digest: 0e8f85da26676ba2b86192ba5c61f82d)
 version = "0.1"
 description = "Record trace data"
-requires = "sexplib sexplib.syntax lwt"
+requires = "lwt ocplib-endian.bigstring"
 archive(byte) = "mProf.cma"
 archive(byte, plugin) = "mProf.cma"
 archive(native) = "mProf.cmxa"
 archive(native, plugin) = "mProf.cmxs"
-exists_if = "mProf.cma"
+exists_if = "mProf.cmxa"
+package "unix" (
+ version = "0.1"
+ description = "Record trace data"
+ requires = "mirage-profile"
+ archive(byte) = "unix_mProf.cma"
+ archive(byte, plugin) = "unix_mProf.cma"
+ archive(native) = "unix_mProf.cmxa"
+ archive(native, plugin) = "unix_mProf.cmxs"
+ exists_if = "unix_mProf.cma"
+)
 # OASIS_STOP
 

@@ -5,11 +5,31 @@ Synopsis:    Record trace data
 Authors:     Thomas Leonard
 License:     BSD-2-clause
 Plugins:     META (0.4), DevFiles (0.4)
+BuildTools:  ocamlbuild
 
 Library "mProf"
+  CompiledObject: native
   Path:		lib
   FindlibName: 	mirage-profile
-  BuildTools: 	ocamlbuild
   Pack:		true
   Modules: 	Trace, Counter
-  BuildDepends: sexplib,sexplib.syntax,lwt
+  BuildDepends: lwt,ocplib-endian.bigstring
+
+Library "unix_mProf"
+  Path:		unix
+  Findlibname:	unix
+  FindlibParent: mProf
+  Modules:	Unix_mProf
+  CSources:	time_stubs.c
+  CCOpt:    	-O3 -Wall
+  BuildDepends: mirage-profile
+
+Executable "benchmark_test"
+  CompiledObject: native
+  MainIs: 	benchmark.ml
+  Install:	false
+  Path:		test
+  BuildDepends: mirage-profile.unix,lwt.unix
+
+Test "benchmark"
+  Command:	$benchmark_test
