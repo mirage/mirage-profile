@@ -10,4 +10,4 @@ Library "mirage-profile"
   Path:       lib
   BuildTools: ocamlbuild
   Modules:    Profile
-  BuildDepends: sexplib,sexplib.syntax,lwt
+  BuildDepends: sexplib,sexplib.syntax,lwt,lwt.tracing
