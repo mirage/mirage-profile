@@ -1,6 +1,3 @@
-EXT sexplib.syntax
-
-PKG sexplib
 PKG lwt
 
 B _build/lib
