@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 7831868a33488a04a75ffbcc4684cc94)
+# DO NOT EDIT (digest: 59c3081a99dff94fcd220f8bceb30b83)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -17,6 +17,8 @@ true: annot, bin_annot
 # Library mProf
 "lib/mProf.cmxs": use_mProf
 "lib/counter.cmx": for-pack(MProf)
+<lib/*.ml{,i,y}>: pkg_cstruct
+<lib/*.ml{,i,y}>: pkg_cstruct.syntax
 <lib/*.ml{,i,y}>: pkg_lwt
 <lib/*.ml{,i,y}>: pkg_ocplib-endian.bigstring
 # Library unix_mProf
@@ -24,18 +26,26 @@ true: annot, bin_annot
 <unix/*.ml{,i,y}>: oasis_library_unix_mprof_ccopt
 "unix/time_stubs.c": oasis_library_unix_mprof_ccopt
 <unix/unix_mProf.{cma,cmxa}>: use_libunix_mProf_stubs
+<unix/*.ml{,i,y}>: pkg_cstruct
+<unix/*.ml{,i,y}>: pkg_cstruct.syntax
 <unix/*.ml{,i,y}>: pkg_lwt
 <unix/*.ml{,i,y}>: pkg_ocplib-endian.bigstring
 <unix/*.ml{,i,y}>: use_mProf
+"unix/time_stubs.c": pkg_cstruct
+"unix/time_stubs.c": pkg_cstruct.syntax
 "unix/time_stubs.c": pkg_lwt
 "unix/time_stubs.c": pkg_ocplib-endian.bigstring
 "unix/time_stubs.c": use_mProf
 # Executable benchmark_test
+"test/benchmark.native": pkg_cstruct
+"test/benchmark.native": pkg_cstruct.syntax
 "test/benchmark.native": pkg_lwt
 "test/benchmark.native": pkg_lwt.unix
 "test/benchmark.native": pkg_ocplib-endian.bigstring
 "test/benchmark.native": use_mProf
 "test/benchmark.native": use_unix_mProf
+<test/*.ml{,i,y}>: pkg_cstruct
+<test/*.ml{,i,y}>: pkg_cstruct.syntax
 <test/*.ml{,i,y}>: pkg_lwt
 <test/*.ml{,i,y}>: pkg_lwt.unix
 <test/*.ml{,i,y}>: pkg_ocplib-endian.bigstring

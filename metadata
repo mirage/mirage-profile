@@ -10,8 +10,8 @@ trace {
 	uuid = "05883b8d-521a-487b-b397-456ab150680c";
 	byte_order = le;
 	packet.header := struct {
-		// uint32_t magic;
-		// uint8_t  uuid[16];
+		uint32_t magic;
+		uint8_t  uuid[16];
 	};
 };
 
@@ -43,6 +43,9 @@ struct event_header {
 } align (8);
 
 stream {
+	packet.context := struct {
+		uint32_t packet_size;
+	};
 	event.header := struct event_header;
 };
 

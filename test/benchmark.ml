@@ -43,11 +43,17 @@ let () =
   test ~name:"plain_lwt:on" plain_lwt;
   test ~name:"profile_lwt:on" profile_lwt;
 
+  MProf.Trace.Control.stop log;
 (*
-  let buffer = MProf.Trace.Control.stop () in
   let ch = open_out "example/trace.bin" in
-  for i = 0 to Bigarray.Array1.dim buffer - 1 do
-    output_char ch (Bigarray.Array1.get buffer i);
-  done;
+  let write_buffer buffer =
+    for i = 0 to Bigarray.Array1.dim buffer - 1 do
+      output_char ch (Bigarray.Array1.get buffer i);
+    done in
+  MProf.Trace.Control.dump log (fun header body ->
+    write_buffer header;
+    write_buffer body;
+    return ()
+  ) |> Lwt_main.run;
   close_out ch
 *)

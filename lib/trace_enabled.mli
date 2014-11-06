@@ -20,10 +20,10 @@ module Control : sig
   val stop : t -> unit
   (** Stop recording. *)
 
-  val dump : t -> (log_buffer -> unit Lwt.t) -> unit Lwt.t
-  (** [dump t fn] calls fn on each trace buffer in the log in series, starting
-   * with the oldest.
-   * The buffer will not change until the thread returns (a new buffer will be
-   * allocated automatically if necessary, if tracing is still in progress).
+  val dump : t -> (log_buffer -> log_buffer -> unit Lwt.t) -> unit Lwt.t
+  (** [dump t fn] calls [fn header body] on each buffer containing unread trace data,
+   * starting with the oldest.
+   * The data will not change until the thread returns, and it must return before
+   * dump can be called again.
    *)
 end

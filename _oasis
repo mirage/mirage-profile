@@ -13,7 +13,7 @@ Library "mProf"
   FindlibName: 	mirage-profile
   Pack:		true
   Modules: 	Trace, Counter
-  BuildDepends: lwt,ocplib-endian.bigstring
+  BuildDepends: lwt,ocplib-endian.bigstring,cstruct,cstruct.syntax
 
 Library "unix_mProf"
   Path:		unix
