@@ -8,13 +8,22 @@ open Bigarray
 type log_buffer = (char, int8_unsigned_elt, c_layout) Array1.t
 
 module Control : sig
-  val start : size:int -> unit
-  (** Allocate a ring buffer with [size] elements and start logging to it. *)
+  type t
 
-  val stop : unit -> log_buffer
-  (** Snapshot the current buffer and stop recording. *)
+  val make : size:int -> unit -> t
+  (** Create a new trace buffer.
+   * @param size the size in bytes of the buffer to use. *)
 
-  val events : unit -> log_buffer
-  (** Return a snapshot of the event ring buffer.
-   * For use while tracing is still active. *)
+  val start : t -> unit
+  (** Start logging to the given buffer. *)
+
+  val stop : t -> unit
+  (** Stop recording. *)
+
+  val dump : t -> (log_buffer -> unit Lwt.t) -> unit Lwt.t
+  (** [dump t fn] calls fn on each trace buffer in the log in series, starting
+   * with the oldest.
+   * The buffer will not change until the thread returns (a new buffer will be
+   * allocated automatically if necessary, if tracing is still in progress).
+   *)
 end

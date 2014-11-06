@@ -23,7 +23,7 @@ let int_of_thread_type t =
   | Map -> 7
   | Condition -> 8
 
-module Log = struct
+module Control = struct
   type t = {
     log : log_buffer;
     mutable next_event : int;
@@ -31,7 +31,9 @@ module Log = struct
 
   let event_log = ref None
 
-  let stop () =
+  let stop log =
+    if Some log <> !event_log then
+      failwith "Log is not currently tracing!";
     Lwt_tracing.tracer := Lwt_tracing.null_tracer;
     event_log := None
 
@@ -159,11 +161,12 @@ module Log = struct
         |> write64 log.log (duration *. 1000000000. |> Int64.of_float)
         |> end_event
 
-  let start ~size =
-    let log = {
+  let make ~size () = {
       log = Array1.create char c_layout size;
       next_event = 0;
-    } in
+    }
+
+  let start log =
     event_log := Some log;
     Lwt_tracing.tracer := { Lwt_tracing.
       note_created = note_created log;
@@ -178,59 +181,46 @@ module Log = struct
 
   let () =
     Callback.register "MProf.Trace.note_gc" note_gc
-end
 
-module Control = struct
-  let events () =
-    let open Log in
-    match !event_log with
-    | None -> failwith "no event log!"
-    | Some event_log ->
-        (* TODO: flag for copy *)
-        Array1.sub event_log.log 0 (event_log.next_event)
-
-  let start ~size =
-    Log.start ~size
-
-  let stop () =
-    let trace = events () in
-    Log.stop ();
-    trace
+  let dump log fn =
+    (* TODO: flag for copy *)
+    let buffer = Array1.sub log.log 0 (log.next_event) in
+    fn buffer
 end
 
 let label name =
-  match !Log.event_log with
+  match !Control.event_log with
   | None -> ()
-  | Some log -> Log.note_label log (Lwt.current_id ()) name
+  | Some log -> Control.note_label log (Lwt.current_id ()) name
 
 let note_suspend () =
-  match !Log.event_log with
+  match !Control.event_log with
   | None -> ()
-  | Some log -> Log.note_suspend log ()
+  | Some log -> Control.note_suspend log ()
 
 let note_resume () =
-  match !Log.event_log with
+  match !Control.event_log with
   | None -> ()
-  | Some log -> Log.note_switch log ()
+  | Some log -> Control.note_switch log ()
 
 let note_increase counter amount =
-  match !Log.event_log with
+  match !Control.event_log with
   | None -> ()
-  | Some log -> Log.note_increase log counter amount
+  | Some log -> Control.note_increase log counter amount
 
 let named_condition label =
   Lwt_condition.create ~label ()
 
 let named_wait label =
   let pair = Lwt.wait () in
-  begin match !Log.event_log with
+  begin match !Control.event_log with
   | None -> ()
-  | Some log -> Log.note_label log (Lwt.id_of_thread (fst pair)) label end;
+  | Some log -> Control.note_label log (Lwt.id_of_thread (fst pair)) label end;
   pair
 
 let named_task label =
   let pair = Lwt.task () in
-  begin match !Log.event_log with
+  begin match !Control.event_log with
   | None -> ()
-  | Some log -> Log.note_label log (Lwt.id_of_thread (fst pair)) label end;
+  | Some log -> Control.note_label log (Lwt.id_of_thread (fst pair)) label end;
   pair

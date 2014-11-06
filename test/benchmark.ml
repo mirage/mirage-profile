@@ -38,7 +38,8 @@ let () =
   test ~name:"profile_lwt:off" profile_lwt;
 
   print_endline "Tracing ON";
-  MProf.Trace.Control.start ~size:1000000;
+  let log = MProf.Trace.Control.make ~size:1000000 () in
+  MProf.Trace.Control.start log;
   test ~name:"plain_lwt:on" plain_lwt;
   test ~name:"profile_lwt:on" profile_lwt;
 
