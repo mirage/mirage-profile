@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 0bde1df57bc610d983266f97869f4e7b)
+# DO NOT EDIT (digest: 6a991e0a6526975d55a97be0d8802e41)
 version = "0.1"
 description = "Record trace data"
 requires = "lwt ocplib-endian.bigstring cstruct cstruct.syntax"
@@ -8,6 +8,17 @@ archive(byte, plugin) = "mProf.cma"
 archive(native) = "mProf.cmxa"
 archive(native, plugin) = "mProf.cmxs"
 exists_if = "mProf.cmxa"
+package "xen" (
+ version = "0.1"
+ description = "Record trace data"
+ requires = "mirage-profile io-page"
+ archive(byte) = "mProf_xen.cma"
+ archive(byte, plugin) = "mProf_xen.cma"
+ archive(native) = "mProf_xen.cmxa"
+ archive(native, plugin) = "mProf_xen.cmxs"
+ exists_if = "mProf_xen.cma"
+)
+
 package "unix" (
  version = "0.1"
  description = "Record trace data"

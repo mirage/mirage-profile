@@ -7,6 +7,10 @@ License:     BSD-2-clause
 Plugins:     META (0.4), DevFiles (0.4)
 BuildTools:  ocamlbuild
 
+Flag xen
+  Description:        true to build Xen library
+  Default:            false
+
 Library "mProf"
   CompiledObject: native
   Path:		lib
@@ -23,6 +27,16 @@ Library "mProf_unix"
   CSources:	time_stubs.c
   CCOpt:    	-O3 -Wall
   BuildDepends: mirage-profile
+
+Library "mProf_xen"
+  Path:		xen
+  Build$:	flag(xen)
+  Findlibname:	xen
+  FindlibParent: mProf
+  Modules:	MProf_xen
+  CSources:	time_stubs.c
+  CCOpt:    	-O3 -Wall
+  BuildDepends: mirage-profile,io-page
 
 Executable "benchmark_test"
   CompiledObject: native

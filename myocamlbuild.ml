@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 3052e83f73f3aad65c862d38580dec2b) *)
+(* DO NOT EDIT (digest: b15bc508acb7df7340b27e3f05242f25) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -608,17 +608,26 @@ open Ocamlbuild_plugin;;
 let package_default =
   {
      MyOCamlbuildBase.lib_ocaml =
-       [("mProf", ["lib"], []); ("mProf_unix", ["unix"], [])];
-     lib_c = [("mProf_unix", "unix", [])];
+       [
+          ("mProf", ["lib"], []);
+          ("mProf_unix", ["unix"], []);
+          ("mProf_xen", ["xen"], [])
+       ];
+     lib_c = [("mProf_unix", "unix", []); ("mProf_xen", "xen", [])];
      flags =
        [
           (["oasis_library_mprof_unix_ccopt"; "compile"],
             [
                (OASISExpr.EBool true,
                  S [A "-ccopt"; A "-O3"; A "-ccopt"; A "-Wall"])
+            ]);
+          (["oasis_library_mprof_xen_ccopt"; "compile"],
+            [
+               (OASISExpr.EBool true,
+                 S [A "-ccopt"; A "-O3"; A "-ccopt"; A "-Wall"])
             ])
        ];
-     includes = [("unix", ["lib"]); ("test", ["unix"])]
+     includes = [("xen", ["lib"]); ("unix", ["lib"]); ("test", ["unix"])]
   }
   ;;
 
@@ -626,11 +635,12 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 630 "myocamlbuild.ml"
+# 639 "myocamlbuild.ml"
 (* OASIS_STOP *)
 
 let () =
   Ocamlbuild_plugin.dispatch (fun e ->
+    (* Detect whether lwt.tracing is available. *)
     let use_tracing =
       match Unix.system("ocamlfind query lwt.tracing > /dev/null 2>&1") with
       | Unix.WEXITED 0 -> true
@@ -648,5 +658,9 @@ let () =
         with Not_found -> () end
     | _ -> ()
     end;
+
+    (* Add pkg-config flags for MProf_xen *)
+
+    (* Apply default config *)
     dispatch_default e
   )
