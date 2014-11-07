@@ -63,7 +63,10 @@ module Packet = struct
     set_packet_header_content_size_high header (bits lsr 16)
 
   let clear packet =
-    set_content_end packet sizeof_packet_header
+    let bits = sizeof_packet_header * 8 in
+    let header = packet.header in
+    set_packet_header_content_size_low header (bits land 0xffff);
+    set_packet_header_content_size_high header (bits lsr 16)
 
   let make ~off ~len buffer =
     let header = Cstruct.of_bigarray ~off ~len:sizeof_packet_header buffer in
