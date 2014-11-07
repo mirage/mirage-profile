@@ -15,11 +15,11 @@ Library "mProf"
   Modules: 	Trace, Counter
   BuildDepends: lwt,ocplib-endian.bigstring,cstruct,cstruct.syntax
 
-Library "unix_mProf"
+Library "mProf_unix"
   Path:		unix
   Findlibname:	unix
   FindlibParent: mProf
-  Modules:	Unix_mProf
+  Modules:	MProf_unix
   CSources:	time_stubs.c
   CCOpt:    	-O3 -Wall
   BuildDepends: mirage-profile

@@ -38,22 +38,10 @@ let () =
   test ~name:"profile_lwt:off" profile_lwt;
 
   print_endline "Tracing ON";
-  let log = MProf.Trace.Control.make ~size:1000000 () in
+  let buffer = Bigarray.(Array1.create char c_layout 1000000) in
+  (* let buffer = MProf_unix.mmap_buffer ~size:1000000 "example/trace.bin" in *)
+  let log = MProf.Trace.Control.make buffer in
   MProf.Trace.Control.start log;
   test ~name:"plain_lwt:on" plain_lwt;
   test ~name:"profile_lwt:on" profile_lwt;
-
-  MProf.Trace.Control.stop log;
-(*
-  let ch = open_out "example/trace.bin" in
-  let write_buffer buffer =
-    for i = 0 to Bigarray.Array1.dim buffer - 1 do
-      output_char ch (Bigarray.Array1.get buffer i);
-    done in
-  MProf.Trace.Control.dump log (fun header body ->
-    write_buffer header;
-    write_buffer body;
-    return ()
-  ) |> Lwt_main.run;
-  close_out ch
-*)
+  MProf.Trace.Control.stop log

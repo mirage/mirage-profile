@@ -1,6 +1,13 @@
 (* Copyright (C) 2014, Thomas Leonard *)
 
-(** This is the [Trace] module when we're compiled with tracing support. *)
+(** This is the [Trace] module when we're compiled with tracing support.
+ *
+ * Note: we expect some kind of logger to process the trace buffer to collect
+ * events, but currently we don't have any barriers to ensure that the buffer
+ * is in a consistent state (although it usually is). So for now, you should
+ * pause tracing before trying to parse the buffer. In particular, GC events
+ * complicate things because we may need to add a GC event while in the middle
+ * of adding some other event. *)
 
 open Bigarray
 
@@ -23,6 +30,56 @@ let int_of_thread_type t =
   | Map -> 7
   | Condition -> 8
 
+module Packet = struct
+  let magic = 0xc1fc1fc1l
+  let uuid = "\x05\x88\x3b\x8d\x52\x1a\x48\x7b\xb3\x97\x45\x6a\xb1\x50\x68\x0c"
+
+  cstruct packet_header {
+    uint32_t magic;
+    uint8_t  uuid[16];
+    uint32_t size;
+    uint16_t content_size_low;    (* 2x16 bit to avoid allocating an Int32 *)
+    uint16_t content_size_high;
+  } as little_endian
+  let () =
+    ignore (copy_packet_header_uuid, hexdump_packet_header, blit_packet_header_uuid)
+
+  type t = {
+    packet_start : int;
+    header : Cstruct.t;
+    packet_end : int;
+  }
+
+  let first_event packet =
+    packet.packet_start + sizeof_packet_header
+
+  let packet_end packet =
+    packet.packet_end
+
+  let set_content_end packet content_end =
+    let header = packet.header in
+    let bits = (content_end - packet.packet_start) * 8 in
+    set_packet_header_content_size_low header (bits land 0xffff);
+    set_packet_header_content_size_high header (bits lsr 16)
+
+  let clear packet =
+    set_content_end packet sizeof_packet_header
+
+  let make ~off ~len buffer =
+    let header = Cstruct.of_bigarray ~off ~len:sizeof_packet_header buffer in
+    set_packet_header_magic header magic;
+    set_packet_header_uuid uuid 0 header;
+    set_packet_header_size header (Int32.of_int (len * 8));
+    let packet = {
+      packet_start = off;
+      header;
+      packet_end = off + len;
+    } in
+    clear packet;
+    packet
+
+end
+
 module Control = struct
   (* Following LTT, our trace buffer is divided into a small number of
    * fixed-sized "packets", each of which contains many events. When there
@@ -32,12 +89,10 @@ module Control = struct
    *)
   type t = {
     log : log_buffer;
-    bits_used : int array;        (* One entry per packet, set when packet is complete. *)
-    packet_size : int;
-    mutable next_event : int;     (* Index to write next event *)
-    mutable packet_end : int;
-    mutable consumer_next : int;  (* Next index to send to consumer *)
-    mutable consumer_reading : bool;  (* Packet containing [consumer_next] is locked. *)
+    mutable next_event : int;     (* Index to write next event (always < packet_end) *)
+    mutable packet_end: int;
+    packets : Packet.t array;
+    mutable active_packet : int;
   }
 
   let event_log = ref None
@@ -46,7 +101,9 @@ module Control = struct
     if Some log <> !event_log then
       failwith "Log is not currently tracing!";
     Lwt_tracing.tracer := Lwt_tracing.null_tracer;
-    event_log := None
+    event_log := None;
+    let last_packet = log.packets.(log.active_packet) in
+    Packet.set_content_end last_packet log.next_event
 
   let op_creates = 0
   let op_read = 1
@@ -74,25 +131,13 @@ module Control = struct
     Array1.set log (i + l) '\x00';
     i + l + 1
 
-  (* The current packet is full. Move to the next one.
-   * If consumer_next is in the next packet then:
-   * - if the consumer is currently reading it, skip it.
-   * - otherwise, advance consumer_next (packet is lost) *)
-  let rec next_packet log =
-    if log.packet_end = Array1.dim log.log then
-      log.packet_end <- log.packet_size
-    else
-      log.packet_end <- log.packet_end + log.packet_size;
-    let packet_start = log.packet_end - log.packet_size in
-    log.next_event <- packet_start;
-    (* Check if the new packet is being consumed. *)
-    let consumer_i = log.consumer_next in
-    if consumer_i >= packet_start && consumer_i < log.packet_end then (
-      if log.consumer_reading then
-        next_packet log
-      else
-        log.consumer_next <- log.packet_end mod Array1.dim log.log
-    )
+  (* The current packet is full. Move to the next one. *)
+  let next_packet log =
+    log.active_packet <- (log.active_packet + 1) mod Array.length log.packets;
+    let packet = log.packets.(log.active_packet) in
+    log.packet_end <- Packet.packet_end packet;
+    log.next_event <- Packet.first_event packet;
+    Packet.clear packet
 
   let rec add_event log op len =
     (* Note: be careful about allocation here, as doing GC will add another event... *)
@@ -101,9 +146,9 @@ module Control = struct
     (* >= rather than > is slightly wasteful, but avoids next_event overlapping the next packet *)
     if new_i >= log.packet_end then (
       (* Printf.printf "can't write %d at %d\n%!" (9 + len) i; *)
-      assert (new_i - i < log.packet_size);
-      let packet_start = log.packet_end - log.packet_size in
-      log.bits_used.(packet_start / log.packet_size) <- (i - packet_start) * 8;
+      let old_packet = log.packets.(log.active_packet) in
+      assert (i > Packet.first_event old_packet);
+      Packet.set_content_end old_packet i;
       next_packet log;
       add_event log op len
     ) else (
@@ -199,21 +244,22 @@ module Control = struct
         |> write64 log.log (duration *. 1000000000. |> Int64.of_float)
         |> end_event
 
-  let magic = 0xc1fc1fc1l
-  let uuid = "\x05\x88\x3b\x8d\x52\x1a\x48\x7b\xb3\x97\x45\x6a\xb1\x50\x68\x0c"
-
-  let make ~size () =
+  let make log =
+    let size = Array1.dim log in
     let n_packets = 4 in
     let packet_size = size / n_packets in
-    let log = Array1.create char c_layout (n_packets * packet_size) in
+    let packets = Array.init n_packets (fun i ->
+      let off = i * packet_size in
+      let len = if i = n_packets - 1 then size - off else packet_size in
+      Packet.make ~off ~len log
+    ) in
+    let active_packet = 0 in
     {
       log;
-      bits_used = Array.make n_packets 0;
-      packet_size;
-      next_event = 0;
-      packet_end = packet_size;
-      consumer_next = 0;
-      consumer_reading = false;
+      packets;
+      active_packet;
+      packet_end = Packet.packet_end packets.(active_packet);
+      next_event = Packet.first_event packets.(active_packet);
     }
 
   let start log =
@@ -231,52 +277,6 @@ module Control = struct
 
   let () =
     Callback.register "MProf.Trace.note_gc" note_gc
-
-  cstruct packet_header {
-    uint32_t magic;
-    uint8_t  uuid[16];
-    uint32_t size;
-  } as little_endian
-  let () =
-    ignore (copy_packet_header_uuid, hexdump_packet_header, blit_packet_header_uuid)
-
-  let dump log fn =
-    let open Lwt in
-    let rec dump_packets () =
-      (* Called with consumer_reading=true, so log.consumer_next won't move,
-       * even if extra events get added (through GC or the [fn] callback).
-       * We might add more events to the packet, but the existing ones won't
-       * get overwritten. *)
-
-      let header = Cstruct.create sizeof_packet_header in
-      set_packet_header_magic header magic;
-      set_packet_header_uuid uuid 0 header;
-
-      let dump_start = log.consumer_next in
-      let consumer_packet = dump_start / log.packet_size in
-      let consumer_packet_start = consumer_packet * log.packet_size in
-      let consumer_packet_end = consumer_packet_start + log.packet_size in
-      let producer_i = log.next_event in
-      let dumping_active = producer_i >= consumer_packet_start && producer_i < consumer_packet_end in
-      let buffer_size =
-        if dumping_active then producer_i - dump_start
-        else log.bits_used.(consumer_packet) / 8 in
-      let buffer_size_bits = Int32.of_int ((sizeof_packet_header + buffer_size) * 8) in
-      (* babeltrace doesn't like it if the packet is incomplete *)
-      set_packet_header_size header buffer_size_bits;
-      (* Printf.printf "dumping %d + %d\n%!" dump_start buffer_size; *)
-      let buffer = Array1.sub log.log dump_start buffer_size in
-      fn (Cstruct.to_bigarray header) buffer >>= fun () ->
-      log.consumer_next <-
-        if dumping_active then producer_i
-        else (dump_start + log.packet_size) mod Array1.dim log.log;
-      if dumping_active then return ()
-      else dump_packets ()
-    in
-    assert (log.consumer_reading = false);
-    log.consumer_reading <- true;
-    finalize dump_packets
-      (fun () -> log.consumer_reading <- false; return ())
 end
 
 let label name =

@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: e5d1ed40a6e0601de9dc5e19ae2f6641)
+# DO NOT EDIT (digest: 0bde1df57bc610d983266f97869f4e7b)
 version = "0.1"
 description = "Record trace data"
 requires = "lwt ocplib-endian.bigstring cstruct cstruct.syntax"
@@ -12,11 +12,11 @@ package "unix" (
  version = "0.1"
  description = "Record trace data"
  requires = "mirage-profile"
- archive(byte) = "unix_mProf.cma"
- archive(byte, plugin) = "unix_mProf.cma"
- archive(native) = "unix_mProf.cmxa"
- archive(native, plugin) = "unix_mProf.cmxs"
- exists_if = "unix_mProf.cma"
+ archive(byte) = "mProf_unix.cma"
+ archive(byte, plugin) = "mProf_unix.cma"
+ archive(native) = "mProf_unix.cmxa"
+ archive(native, plugin) = "mProf_unix.cmxs"
+ exists_if = "mProf_unix.cma"
 )
 # OASIS_STOP
 

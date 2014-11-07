@@ -45,6 +45,8 @@ struct event_header {
 stream {
 	packet.context := struct {
 		uint32_t packet_size;
+		uint32_t content_size;
+
 	};
 	event.header := struct event_header;
 };

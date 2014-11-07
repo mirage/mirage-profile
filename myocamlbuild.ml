@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 364e4130af3e135a7fe8bfaf102139cf) *)
+(* DO NOT EDIT (digest: 3052e83f73f3aad65c862d38580dec2b) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -608,11 +608,11 @@ open Ocamlbuild_plugin;;
 let package_default =
   {
      MyOCamlbuildBase.lib_ocaml =
-       [("mProf", ["lib"], []); ("unix_mProf", ["unix"], [])];
-     lib_c = [("unix_mProf", "unix", [])];
+       [("mProf", ["lib"], []); ("mProf_unix", ["unix"], [])];
+     lib_c = [("mProf_unix", "unix", [])];
      flags =
        [
-          (["oasis_library_unix_mprof_ccopt"; "compile"],
+          (["oasis_library_mprof_unix_ccopt"; "compile"],
             [
                (OASISExpr.EBool true,
                  S [A "-ccopt"; A "-O3"; A "-ccopt"; A "-Wall"])
