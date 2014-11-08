@@ -43,6 +43,10 @@ struct event_header {
 	} id;
 } align (8);
 
+struct thread_context {
+	uint64_t thread;
+} align (8);
+
 stream {
 	packet.context := struct {
 		uint32_t packet_size;
@@ -54,83 +58,81 @@ stream {
 };
 
 event {
+	name = creates;
+	id = 0;
+	context := struct thread_context;
 	fields := struct {
-		uint64_t parent;
 		uint64_t child;
 		enum thread_type thread_type;
 	};
-	name = creates;
-	id = 0;
 };
 
 event {
-	fields := struct {
-		uint64_t reader;
-		uint64_t source;
-	};
 	name = read;
 	id = 1;
+	context := struct thread_context;
+	fields := struct {
+		uint64_t source;
+	};
 };
 
 event {
-	fields := struct {
-		uint64_t resolver;
-		uint64_t resolvee;
-	};
 	name = fulfills;
 	id = 2;
+	context := struct thread_context;
+	fields := struct {
+		uint64_t resolvee;
+	};
 };
 
 event {
+	name = fails;
+	id = 3;
+	context := struct thread_context;
 	fields := struct {
-		uint64_t resolver;
 		uint64_t resolvee;
 		string exn;
 	};
-	name = fails;
-	id = 3;
 };
 
 event {
-	fields := struct {
-		uint64_t bind;
-		uint64_t thread;
-	};
 	name = becomes;
 	id = 4;
+	context := struct thread_context;
+	fields := struct {
+		uint64_t sleeper;
+	};
 };
 
 event {
-	fields := struct {
-		uint64_t thread;
-		string label;
-	};
 	name = label;
 	id = 5;
+	context := struct thread_context;
+	fields := struct {
+		string label;
+	};
 };
 
 event {
+	name = increase;
+	id = 6;
+	context := struct thread_context;
 	fields := struct {
-		uint64_t thread;
 		int64_t amount;
 		string counter;
 	};
-	name = increase;
-	id = 6;
 };
 
 event {
-	fields := struct {
-		uint64_t thread;
-	};
 	name = switch;
 	id = 7;
+	context := struct thread_context;
 };
 
 event {
+	name = gc;
+	id = 8;
 	fields := struct {
 		uint64_t duration_ns;
 	};
-	name = gc;
-	id = 8;
 };
