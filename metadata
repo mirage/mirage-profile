@@ -1,5 +1,6 @@
 /* CTF 1.8 */
 typealias integer { size = 8; align = 8; signed = false; base = 10; } := uint8_t;
+typealias integer { size = 16; align = 8; signed = false; base = hex; } := uint16_t;
 typealias integer { size = 32; align = 8; signed = false; base = hex; } := uint32_t;
 typealias integer { size = 64; align = 8; signed = false; base = hex; } := uint64_t;
 typealias integer { size = 64; align = 8; signed = true; base = 10; } := int64_t;
@@ -45,6 +46,7 @@ struct event_header {
 stream {
 	packet.context := struct {
 		uint32_t packet_size;
+		uint16_t stream_packet_count;
 		uint32_t content_size;
 
 	};

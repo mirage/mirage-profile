@@ -35,9 +35,13 @@ module Packet = struct
   let uuid = "\x05\x88\x3b\x8d\x52\x1a\x48\x7b\xb3\x97\x45\x6a\xb1\x50\x68\x0c"
 
   cstruct packet_header {
+    (* Stream header, repeated for each packet *)
     uint32_t magic;
     uint8_t  uuid[16];
+
+    (* Packet header *)
     uint32_t size;
+    uint16_t stream_packet_count;
     uint16_t content_size_low;    (* 2x16 bit to avoid allocating an Int32 *)
     uint16_t content_size_high;
   } as little_endian
@@ -62,13 +66,14 @@ module Packet = struct
     set_packet_header_content_size_low header (bits land 0xffff);
     set_packet_header_content_size_high header (bits lsr 16)
 
-  let clear packet =
+  let clear ~count packet =
     let bits = sizeof_packet_header * 8 in
     let header = packet.header in
+    set_packet_header_stream_packet_count header (count land 0xffff);
     set_packet_header_content_size_low header (bits land 0xffff);
     set_packet_header_content_size_high header (bits lsr 16)
 
-  let make ~off ~len buffer =
+  let make ~count ~off ~len buffer =
     let header = Cstruct.of_bigarray ~off ~len:sizeof_packet_header buffer in
     set_packet_header_magic header magic;
     set_packet_header_uuid uuid 0 header;
@@ -78,7 +83,7 @@ module Packet = struct
       header;
       packet_end = off + len;
     } in
-    clear packet;
+    clear ~count packet;
     packet
 
 end
@@ -96,6 +101,10 @@ module Control = struct
     mutable packet_end: int;
     packets : Packet.t array;
     mutable active_packet : int;
+
+    (* Each packet is numbered, making it easy to get the order when reading the
+     * ring buffer and allowing for detection of missed packets. *)
+    mutable next_stream_packet_count : int;
   }
 
   let event_log = ref None
@@ -140,7 +149,9 @@ module Control = struct
     let packet = log.packets.(log.active_packet) in
     log.packet_end <- Packet.packet_end packet;
     log.next_event <- Packet.first_event packet;
-    Packet.clear packet
+    let count = log.next_stream_packet_count in
+    Packet.clear packet ~count;
+    log.next_stream_packet_count <- count + 1
 
   let rec add_event log op len =
     (* Note: be careful about allocation here, as doing GC will add another event... *)
@@ -254,7 +265,7 @@ module Control = struct
     let packets = Array.init n_packets (fun i ->
       let off = i * packet_size in
       let len = if i = n_packets - 1 then size - off else packet_size in
-      Packet.make ~off ~len log
+      Packet.make ~count:i ~off ~len log
     ) in
     let active_packet = 0 in
     {
@@ -263,6 +274,7 @@ module Control = struct
       active_packet;
       packet_end = Packet.packet_end packets.(active_packet);
       next_event = Packet.first_event packets.(active_packet);
+      next_stream_packet_count = 1;
     }
 
   let start log =
