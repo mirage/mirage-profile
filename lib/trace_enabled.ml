@@ -113,9 +113,7 @@ module Control = struct
     if Some log <> !event_log then
       failwith "Log is not currently tracing!";
     Lwt_tracing.tracer := Lwt_tracing.null_tracer;
-    event_log := None;
-    let last_packet = log.packets.(log.active_packet) in
-    Packet.set_content_end last_packet log.next_event
+    event_log := None
 
   let op_creates = 0
   let op_read = 1
@@ -162,12 +160,12 @@ module Control = struct
       (* Printf.printf "can't write %d at %d\n%!" (9 + len) i; *)
       let old_packet = log.packets.(log.active_packet) in
       assert (i > Packet.first_event old_packet);
-      Packet.set_content_end old_packet i;
       next_packet log;
       add_event log op len
     ) else (
       (* Printf.printf "writing at %d\n%!" i; *)
       log.next_event <- new_i;
+      Packet.set_content_end log.packets.(log.active_packet) new_i;
       timestamp log.log i;
       i + 8 |> write8 log.log op
     )
