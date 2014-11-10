@@ -6,10 +6,19 @@ authors: "Thomas Leonard <talex5@gmail.com>"
 homepage: "https://github.com/talex5/mirage-profile"
 bug-reports: "https://github.com/talex5/mirage-profile"
 license: "BSD-2-clause"
-build: [make]
+build: [
+	["./configure"
+	  "--prefix" prefix
+	  "--%{mirage-xen-minios:enable}%-xen"
+	]
+	[make]
+]
 install: [make "install"]
 remove: ["ocamlfind" "remove" "mirage-profile"]
 depends: [
   "ocamlfind" {build}
   "lwt"
+]
+depopts: [
+	"mirage-xen-minios"
 ]
