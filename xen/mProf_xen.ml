@@ -1,5 +1,10 @@
 (* Copyright (C) 2014, Thomas Leonard *)
 
+open Bigarray
+type log_buffer = (char, int8_unsigned_elt, c_layout) Array1.t
+
+external timestamper : MProf.Trace.log_buffer -> int -> unit = "stub_mprof_get_monotonic_time"
+
 let make_shared_buffer ~size =
   let open Io_page in
   let n_pages = round_to_page_size size / round_to_page_size 1 in

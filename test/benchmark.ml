@@ -40,7 +40,7 @@ let () =
   print_endline "Tracing ON";
   let buffer = Bigarray.(Array1.create char c_layout 1000000) in
   (* let buffer = MProf_unix.mmap_buffer ~size:1000000 "example/trace.bin" in *)
-  let log = MProf.Trace.Control.make buffer in
+  let log = MProf.Trace.Control.make buffer MProf_unix.timestamper in
   MProf.Trace.Control.start log;
   test ~name:"plain_lwt:on" plain_lwt;
   test ~name:"profile_lwt:on" profile_lwt;
