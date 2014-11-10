@@ -6,11 +6,7 @@
  * call the underlying untraced operation, as appropriate). The compiler should
  * optimise them out in this case.  *)
 
-val note_suspend : unit -> unit
-(** Record that the program is about to sleep. *)
-
-val note_resume : unit -> unit
-(** Record that the program has just resumed from sleep. *)
+(** {2 General tracing calls for libraries} *)
 
 val label : string -> unit
 (** Attach a label/comment to the currently executing thread. *)
@@ -27,3 +23,16 @@ val named_condition : string -> 'a Lwt_condition.t
 val note_increase : string -> int -> unit
 (** [incr name amount] increases the named counter.
  * Deprecated: used Counter.increase instead. *)
+
+(** {2 Interface for the main loop} *)
+
+type hiatus_reason =
+  | Wait_for_work
+  | Suspend
+  | Hibernate
+
+val note_hiatus : hiatus_reason -> unit
+(** Record that the process is about to stop running for a while. *)
+
+val note_resume : unit -> unit
+(** Record that the program has just resumed running. *)

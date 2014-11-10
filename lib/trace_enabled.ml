@@ -11,6 +11,11 @@
 
 open Bigarray
 
+type hiatus_reason =
+  | Wait_for_work
+  | Suspend
+  | Hibernate
+
 type log_buffer = (char, int8_unsigned_elt, c_layout) Array1.t
 
 external timestamp : log_buffer -> int -> unit = "stub_mprof_get_monotonic_time"
@@ -297,7 +302,7 @@ let label name =
   | None -> ()
   | Some log -> Control.note_label log (Lwt.current_id ()) name
 
-let note_suspend () =
+let note_hiatus _reason =
   match !Control.event_log with
   | None -> ()
   | Some log -> Control.note_suspend log ()

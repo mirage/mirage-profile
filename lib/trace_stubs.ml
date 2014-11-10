@@ -2,7 +2,12 @@
 
 (** This is the [Trace] module when we're compiled without tracing support. *)
 
-let note_suspend () = ()
+type hiatus_reason =
+  | Wait_for_work
+  | Suspend
+  | Hibernate
+
+let note_hiatus _reason = ()
 let note_resume () = ()
 
 let label _label = ()
