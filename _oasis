@@ -41,6 +41,7 @@ Library "mProf_xen"
 Executable "benchmark_test"
   CompiledObject: native
   MainIs: 	benchmark.ml
+  Build$:	flag(tests)
   Install:	false
   Path:		test
   BuildDepends: mirage-profile.unix,lwt.unix
