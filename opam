@@ -17,6 +17,9 @@ install: [make "install"]
 remove: ["ocamlfind" "remove" "mirage-profile"]
 depends: [
   "ocamlfind" {build}
+  "cstruct"
+  "ocplib-endian"
+  "io-page"
   "lwt"
 ]
 depopts: [
