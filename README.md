@@ -16,14 +16,17 @@ This will cause mirage-profile and any programs using it to be recompiled with t
 
 To begin tracing, create a buffer and call `MProf.Trace.Control.start`:
 
+    let trace_pages = MProf_xen.make_shared_buffer ~size:1000000
     let () = 
-      let trace_pages = MProf_xen.make_shared_buffer ~size:1000000 in
       let buffer = trace_pages |> Io_page.to_cstruct |> Cstruct.to_bigarray in
       let trace_config = MProf.Trace.Control.make buffer MProf_xen.timestamper in
       MProf.Trace.Control.start trace_config
 
-Using `MProf_xen` creates a buffer in RAM and shares it with Dom0.
-Using `MProf_unix` creates a mmapped file for the buffer.
+To share the buffer with dom0, do this somewhere in your initialisation code:
+
+    MProf_xen.share_with (module Gnt.Gntshr) (module OS.Xs) ~domid:0 trace_pages
+
+Using `MProf_unix` instead of `MProf_xen` creates a mmapped file for the buffer.
 
 To view the trace you should, ideally, call `MProf.Trace.Control.stop` before reading the buffer to avoid race conditions, but in practice reading the trace at any time usually works.
 
