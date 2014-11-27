@@ -3,7 +3,10 @@
 open Bigarray
 type log_buffer = (char, int8_unsigned_elt, c_layout) Array1.t
 
-external timestamper : log_buffer -> int -> unit = "stub_mprof_get_monotonic_time"
+external get_monotonic_time : unit -> int64 = "caml_get_monotonic_time"
+
+let timestamper buf off =
+  EndianBigstring.LittleEndian.set_int64 buf off (get_monotonic_time ())
 
 let make_shared_buffer ~size =
   let open Io_page in

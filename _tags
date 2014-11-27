@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 914c5fe4336837772f9021cbbb1ffb3c)
+# DO NOT EDIT (digest: be3a945dbe48e490e41c80a6ecc78cb0)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -38,21 +38,12 @@ true: annot, bin_annot
 "unix/time_stubs.c": use_mProf
 # Library mProf_xen
 "xen/mProf_xen.cmxs": use_mProf_xen
-<xen/*.ml{,i,y}>: oasis_library_mprof_xen_ccopt
-"xen/time_stubs.c": oasis_library_mprof_xen_ccopt
-<xen/mProf_xen.{cma,cmxa}>: use_libmProf_xen_stubs
 <xen/*.ml{,i,y}>: pkg_cstruct
 <xen/*.ml{,i,y}>: pkg_cstruct.syntax
 <xen/*.ml{,i,y}>: pkg_io-page
 <xen/*.ml{,i,y}>: pkg_lwt
 <xen/*.ml{,i,y}>: pkg_ocplib-endian.bigstring
 <xen/*.ml{,i,y}>: use_mProf
-"xen/time_stubs.c": pkg_cstruct
-"xen/time_stubs.c": pkg_cstruct.syntax
-"xen/time_stubs.c": pkg_io-page
-"xen/time_stubs.c": pkg_lwt
-"xen/time_stubs.c": pkg_ocplib-endian.bigstring
-"xen/time_stubs.c": use_mProf
 # Executable benchmark_test
 "test/benchmark.native": pkg_cstruct
 "test/benchmark.native": pkg_cstruct.syntax

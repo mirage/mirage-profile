@@ -8,7 +8,7 @@ Plugins:     META (0.4), DevFiles (0.4)
 BuildTools:  ocamlbuild
 
 Flag xen
-  Description:        true to build Xen library
+  Description:        Build Xen library
   Default:            false
 
 Library "mProf"
@@ -34,8 +34,6 @@ Library "mProf_xen"
   Findlibname:	xen
   FindlibParent: mProf
   Modules:	MProf_xen
-  CSources:	time_stubs.c
-  CCOpt:    	-O3 -Wall
   BuildDepends: mirage-profile,io-page
 
 Executable "benchmark_test"
