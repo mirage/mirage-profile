@@ -340,3 +340,9 @@ let named_task label =
   | None -> ()
   | Some log -> Control.note_label log (Lwt.id_of_thread (fst pair)) label end;
   pair
+
+let named_mvar label v =
+  Lwt_mvar.create ~label v
+
+let named_mvar_empty label =
+  Lwt_mvar.create_empty ~label ()

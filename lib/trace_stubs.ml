@@ -14,5 +14,7 @@ let label _label = ()
 let named_wait _label = Lwt.wait ()
 let named_task _label = Lwt.task ()
 let named_condition _label = Lwt_condition.create ()
+let named_mvar _label v = Lwt_mvar.create v
+let named_mvar_empty _label = Lwt_mvar.create_empty ()
 
 let note_increase _counter _amount = ()

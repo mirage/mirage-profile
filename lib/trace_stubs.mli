@@ -20,6 +20,12 @@ val named_task : string -> 'a Lwt.t * 'a Lwt.u
 val named_condition : string -> 'a Lwt_condition.t
 (** Create a Lwt_condition that will label its thread with the given name. *)
 
+val named_mvar_empty : string -> 'a Lwt_mvar.t
+(** Create a Lwt_mvar that will label its threads with the given name. *)
+
+val named_mvar : string -> 'a -> 'a Lwt_mvar.t
+(** Create a Lwt_mvar that will label its threads with the given name. *)
+
 val note_increase : string -> int -> unit
 (** [incr name amount] increases the named counter.
  * Deprecated: used Counter.increase instead. *)
