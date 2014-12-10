@@ -39,7 +39,8 @@ struct event_header {
 		label = 5,
 		increase = 6,
 		switch = 7,
-		gc = 8
+		gc = 8,
+		signal = 9,
 	} id;
 } align (8);
 
@@ -136,3 +137,13 @@ event {
 		uint64_t duration_ns;
 	};
 };
+
+event {
+	name = signal;
+	id = 9;
+	context := struct thread_context;
+	fields := struct {
+		uint64_t source;
+	};
+};
+

@@ -135,6 +135,7 @@ module Control = struct
   let op_increase = 6
   let op_switch = 7
   let op_gc = 8
+  let op_signal = 9
 
   let write64 log v i =
     EndianBigstring.LittleEndian.set_int64 log i v;
@@ -207,6 +208,13 @@ module Control = struct
       |> write64 log.log input
       |> end_event
     )
+
+  let note_signal log source =
+    current_thread := Lwt.current_id ();
+    add_event log op_signal 16
+    |> write64 log.log !current_thread
+    |> write64 log.log source
+    |> end_event
 
   let note_resolved log p ~ex =
     match ex with
@@ -293,6 +301,7 @@ module Control = struct
       note_created = note_created log;
       note_read = note_read log;
       note_resolved = note_resolved log;
+      note_signal = note_signal log;
       note_becomes = note_becomes log;
       note_label = note_label log;
       note_switch = note_switch log;
