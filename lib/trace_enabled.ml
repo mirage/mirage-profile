@@ -289,7 +289,7 @@ module Control = struct
 
   let start log =
     event_log := Some log;
-    Lwt_tracing.tracer := { Lwt_tracing.
+    Lwt_tracing.(tracer := {null_tracer with
       note_created = note_created log;
       note_read = note_read log;
       note_resolved = note_resolved log;
@@ -297,7 +297,7 @@ module Control = struct
       note_label = note_label log;
       note_switch = note_switch log;
       note_suspend = note_suspend log;
-    };
+    });
     note_switch log ()
 
   let () =
