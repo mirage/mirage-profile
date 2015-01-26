@@ -6,7 +6,11 @@ Libraries can use the functions mirage-profile provides to annotate the traces w
 When compiled against a normal version of Lwt, mirage-profile's functions are null-ops (or call the underlying untraced operation, as appropriate) and OCaml's cross-module inlining will optimise these calls away, meaning there should be no overhead in the non-profiling case.
 
 
-## Recording traces
+## Use with Mirage
+
+See http://openmirage.org/wiki/profiling for instructions.
+
+## Recording traces manually
 
 To record traces you need to pin a version of Lwt with tracing support (this provides the `lwt.tracing` findlib module):
 
@@ -27,6 +31,8 @@ To share the buffer with dom0, do this somewhere in your initialisation code:
     MProf_xen.share_with (module Gnt.Gntshr) (module OS.Xs) ~domid:0 trace_pages
 
 Using `MProf_unix` instead of `MProf_xen` creates a mmapped file for the buffer.
+
+## Viewing traces
 
 To view the trace you should, ideally, call `MProf.Trace.Control.stop` before reading the buffer to avoid race conditions, but in practice reading the trace at any time usually works.
 
