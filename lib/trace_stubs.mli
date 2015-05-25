@@ -30,6 +30,11 @@ val note_increase : string -> int -> unit
 (** [incr name amount] increases the named counter.
  * Deprecated: used Counter.increase instead. *)
 
+val should_resolve : 'a Lwt.t -> unit
+(** Add a hint that this thread is expected to resolve.
+ * This is useful if a thread never completes and you want to find out why.
+ * Without the hint, the viewer makes such threads almost invisible. *)
+
 (** {2 Interface for the main loop} *)
 
 type hiatus_reason =

@@ -143,6 +143,7 @@ module Control = struct
   let op_switch = 7
   let op_gc = 8
   let op_signal = 9
+  let op_try_read = 10
 
   let write64 log v i =
     EndianBigstring.LittleEndian.set_int64 log i v;
@@ -215,6 +216,12 @@ module Control = struct
       |> write64 log.log input
       |> end_event
     )
+
+  let note_try_read log thread input =
+    add_event log op_try_read 16
+    |> write64 log.log thread
+    |> write64 log.log input
+    |> end_event
 
   let note_signal log source =
     current_thread := Lwt.current_id ();
@@ -307,6 +314,7 @@ module Control = struct
     Lwt_tracing.(tracer := {null_tracer with
       note_created = note_created log;
       note_read = note_read log;
+      note_try_read = note_try_read log;
       note_resolved = note_resolved log;
       note_signal = note_signal log;
       note_becomes = note_becomes log;
@@ -362,3 +370,8 @@ let named_mvar label v =
 
 let named_mvar_empty label =
   Lwt_mvar.create_empty ~label ()
+
+let should_resolve thread =
+  match !Control.event_log with
+  | None -> ()
+  | Some log -> Control.note_label log (Lwt.id_of_thread thread) "__should_resolve" (* Hack! *)

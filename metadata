@@ -41,6 +41,7 @@ struct event_header {
 		switch = 7,
 		gc = 8,
 		signal = 9,
+                try_read = 10,
 	} id;
 } align (8);
 
@@ -147,3 +148,11 @@ event {
 	};
 };
 
+event {
+	name = try_read;
+	id = 10;
+	context := struct thread_context;
+	fields := struct {
+		uint64_t source;
+	};
+};
