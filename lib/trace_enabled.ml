@@ -26,6 +26,7 @@ type timestamper = log_buffer -> int -> unit
 
 let current_thread = ref (-1L)
 
+let did_warn_types = ref false
 let int_of_thread_type t =
   let open Lwt_tracing in
   match t with
@@ -38,6 +39,12 @@ let int_of_thread_type t =
   | Join -> 6
   | Map -> 7
   | Condition -> 8
+  | _ ->
+      if not !did_warn_types then (
+        Printf.eprintf "Warning: unknown thread type!\n%!";
+        did_warn_types := true
+      );
+      99
 
 module Packet = struct
   let magic = 0xc1fc1fc1l
