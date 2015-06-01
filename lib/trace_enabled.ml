@@ -39,6 +39,11 @@ let int_of_thread_type t =
   | Join -> 6
   | Map -> 7
   | Condition -> 8
+  | On_success -> 9
+  | On_failure -> 10
+  | On_termination -> 11
+  | On_any -> 12
+  | Ignore_result -> 13
   | _ ->
       if not !did_warn_types then (
         Printf.eprintf "Warning: unknown thread type!\n%!";

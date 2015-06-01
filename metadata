@@ -25,7 +25,12 @@ enum thread_type : uint8_t {
 	Pick = 5,
 	Join = 6,
 	Map = 7,
-	Condition = 8
+	Condition = 8,
+	On_success = 9,
+	On_failure = 10,
+	On_termination = 11,
+	On_any = 12,
+	Ignore_result = 13,
 };
 
 struct event_header {
