@@ -61,5 +61,5 @@ true: annot, bin_annot
 <test/*.ml{,i,y}>: use_mProf_unix
 # OASIS_STOP
 <lib/trace.ml{,i}>: for-pack(MProf)
-true: strict_sequence, warn(A-4-3-23)
+true: strict_sequence, warn(A-4-3-23-11)
 false: profile
