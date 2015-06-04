@@ -19,3 +19,4 @@ let named_mvar_empty _label = Lwt_mvar.create_empty ()
 let should_resolve _thread = ()
 
 let note_increase _counter _amount = ()
+let note_counter_value _counter _value = ()

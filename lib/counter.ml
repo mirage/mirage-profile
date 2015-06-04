@@ -8,10 +8,11 @@ type t = {
 let create ?(init=0) ~name () = { name; value = init }
 let make ~name = create ~name ()
 
+let set_value m v =
+  m.value <- v;
+  Trace.note_counter_value m.name v
+
 let increase m amount =
-  m.value <- m.value + amount;
-  Trace.note_increase m.name amount
+  set_value m (m.value + amount)
 
 let value m = m.value
-
-let set_value m v = increase m (v - m.value)

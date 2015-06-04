@@ -149,6 +149,7 @@ module Control = struct
   let op_gc = 8
   let op_signal = 9
   let op_try_read = 10
+  let op_counter_value = 11
 
   let write64 log v i =
     EndianBigstring.LittleEndian.set_int64 log i v;
@@ -271,6 +272,13 @@ module Control = struct
     |> write_string log.log counter
     |> end_event
 
+  let note_counter_value log counter value =
+    add_event log op_counter_value (17 + String.length counter)
+    |> write64 log.log !current_thread
+    |> write64 log.log (Int64.of_int value)
+    |> write_string log.log counter
+    |> end_event
+
   let note_switch log () =
     let id = Lwt.current_id () in
     if id <> !current_thread then (
@@ -352,6 +360,11 @@ let note_increase counter amount =
   match !Control.event_log with
   | None -> ()
   | Some log -> Control.note_increase log counter amount
+
+let note_counter_value counter value =
+  match !Control.event_log with
+  | None -> ()
+  | Some log -> Control.note_counter_value log counter value
 
 let named_condition label =
   Lwt_condition.create ~label ()

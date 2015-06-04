@@ -27,8 +27,11 @@ val named_mvar : string -> 'a -> 'a Lwt_mvar.t
 (** Create a Lwt_mvar that will label its threads with the given name. *)
 
 val note_increase : string -> int -> unit
-(** [incr name amount] increases the named counter.
- * Deprecated: used Counter.increase instead. *)
+(* Deprecated: use Counter.increase instead. *)
+
+val note_counter_value : string -> int -> unit
+(** Records the current value of the named counter.
+ * (for internal use: use Counter.set_value instead) *)
 
 val should_resolve : 'a Lwt.t -> unit
 (** Add a hint that this thread is expected to resolve.
