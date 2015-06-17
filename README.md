@@ -18,7 +18,7 @@ To record traces you need to pin a version of Lwt with tracing support (this pro
 
 This will cause mirage-profile and any programs using it to be recompiled with tracing enabled.
 
-To begin tracing, create a buffer and call `MProf.Trace.Control.start`:
+To begin tracing a **Xen unikernel**, create a buffer and call `MProf.Trace.Control.start`:
 
     let trace_pages = MProf_xen.make_shared_buffer ~size:1000000
     let () = 
@@ -30,7 +30,12 @@ To share the buffer with dom0, do this somewhere in your initialisation code:
 
     MProf_xen.share_with (module Gnt.Gntshr) (module OS.Xs) ~domid:0 trace_pages
 
-Using `MProf_unix` instead of `MProf_xen` creates a mmapped file for the buffer.
+To trace a **Unix process**, use `MProf_unix.mmap_buffer` to write to an mmapped file:
+
+    let () =
+      let buffer = MProf_unix.mmap_buffer ~size:1000000 "trace.ctf" in
+      let trace_config = MProf.Trace.Control.make buffer MProf_unix.timestamper in
+      MProf.Trace.Control.start trace_config
 
 ## Viewing traces
 
