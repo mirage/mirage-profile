@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 5bad7a6949e13057c91d44e9e92880ff) *)
+(* DO NOT EDIT (digest: 6cb582fefd796aa54929681575c43efa) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -619,7 +619,15 @@ let package_default =
           (["oasis_library_mprof_unix_ccopt"; "compile"],
             [
                (OASISExpr.EBool true,
-                 S [A "-ccopt"; A "-O3"; A "-ccopt"; A "-Wall"])
+                 S
+                   [
+                      A "-ccopt";
+                      A "-O3";
+                      A "-ccopt";
+                      A "-Wall";
+                      A "-ccopt";
+                      A "-lrt"
+                   ])
             ])
        ];
      includes = [("xen", ["lib"]); ("unix", ["lib"]); ("test", ["unix"])]
@@ -630,7 +638,7 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 634 "myocamlbuild.ml"
+# 642 "myocamlbuild.ml"
 (* OASIS_STOP *)
 
 let () =

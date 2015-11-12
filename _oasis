@@ -25,7 +25,7 @@ Library "mProf_unix"
   FindlibParent: mProf
   Modules:	MProf_unix
   CSources:	time_stubs.c
-  CCOpt:    	-O3 -Wall
+  CCOpt:    	-O3 -Wall -lrt
   BuildDepends: mirage-profile
 
 Library "mProf_xen"
