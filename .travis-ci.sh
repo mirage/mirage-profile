@@ -18,8 +18,8 @@ export OPAMYES=1
 opam init git://github.com/ocaml/opam-repository
 eval `opam config env`
 opam update
+
 opam pin add mirage-profile .
-opam install mirage-profile
 
 echo Just stubs
 ls -l `ocamlfind query mirage-profile`/*.a
@@ -29,6 +29,8 @@ ocamlfind query lwt.tracing
 
 echo Unix tracing
 ls -l `ocamlfind query mirage-profile`/*.a
+./configure --enable-tests
+make test
 
 opam install mirage-xen-minios
 
