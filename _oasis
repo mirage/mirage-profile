@@ -1,6 +1,6 @@
 OASISFormat: 0.4
 Name:        mirage-profile
-Version:     0.6
+Version:     0.6.1
 Synopsis:    Record trace data
 Authors:     Thomas Leonard
 License:     BSD-2-clause
@@ -26,7 +26,8 @@ Library "mProf_unix"
   Modules:	MProf_unix
   CSources:	time_stubs.c
   CCOpt:    	-O3 -Wall
-  CCLib:	-lrt
+  if os_type(Unix)
+    CCLib:	-lrt
   BuildDepends: mirage-profile
 
 Library "mProf_xen"
