@@ -26,8 +26,6 @@ Library "mProf_unix"
   Modules:	MProf_unix
   CSources:	time_stubs.c
   CCOpt:    	-O3 -Wall
-  if os_type(Unix)
-    CCLib:	-lrt
   BuildDepends: mirage-profile
 
 Library "mProf_xen"

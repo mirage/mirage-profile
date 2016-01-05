@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 53bc006bd3b9ec2dec42583e4781e7ec) *)
+(* DO NOT EDIT (digest: 5bad7a6949e13057c91d44e9e92880ff) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -620,17 +620,6 @@ let package_default =
             [
                (OASISExpr.EBool true,
                  S [A "-ccopt"; A "-O3"; A "-ccopt"; A "-Wall"])
-            ]);
-          (["oasis_library_mprof_unix_cclib"; "link"],
-            [
-               (OASISExpr.EBool true, S []);
-               (OASISExpr.ETest ("os_type", "Unix"),
-                 S [A "-cclib"; A "-lrt"])
-            ]);
-          (["oasis_library_mprof_unix_cclib"; "ocamlmklib"; "c"],
-            [
-               (OASISExpr.EBool true, S []);
-               (OASISExpr.ETest ("os_type", "Unix"), S [A "-lrt"])
             ])
        ];
      includes = [("xen", ["lib"]); ("unix", ["lib"]); ("test", ["unix"])]
@@ -641,8 +630,14 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 645 "myocamlbuild.ml"
+# 634 "myocamlbuild.ml"
 (* OASIS_STOP *)
+
+(* Copied from mtime *)
+let os = Ocamlbuild_pack.My_unix.run_and_read "uname -s"
+let system_support_lib = match os with
+| "Linux\n" -> [A "-cclib"; A "-lrt"]
+| _ -> []
 
 let () =
   Ocamlbuild_plugin.dispatch (fun e ->
@@ -662,6 +657,9 @@ let () =
           copy_rule "copy-tracing" trace_src "lib/trace.ml";
           copy_rule "copy-tracing-mli" (trace_src ^ "i") "lib/trace.mli";
         with Not_found -> () end
+    | After_rules ->
+        flag ["link"; "link_rt"] (S system_support_lib);
+        flag ["link"; "link_rt"] (S system_support_lib);
     | _ -> ()
     end;
 

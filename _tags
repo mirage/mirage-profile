@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 2901714505f8091bc2a1b3286253a94b)
+# DO NOT EDIT (digest: be3a945dbe48e490e41c80a6ecc78cb0)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -25,11 +25,6 @@ true: annot, bin_annot
 "unix/mProf_unix.cmxs": use_mProf_unix
 <unix/*.ml{,i,y}>: oasis_library_mprof_unix_ccopt
 "unix/time_stubs.c": oasis_library_mprof_unix_ccopt
-<unix/mProf_unix.{cma,cmxa}>: oasis_library_mprof_unix_cclib
-"unix/libmProf_unix_stubs.lib": oasis_library_mprof_unix_cclib
-"unix/dllmProf_unix_stubs.dll": oasis_library_mprof_unix_cclib
-"unix/libmProf_unix_stubs.a": oasis_library_mprof_unix_cclib
-"unix/dllmProf_unix_stubs.so": oasis_library_mprof_unix_cclib
 <unix/mProf_unix.{cma,cmxa}>: use_libmProf_unix_stubs
 <unix/*.ml{,i,y}>: pkg_cstruct
 <unix/*.ml{,i,y}>: pkg_cstruct.syntax
@@ -68,3 +63,4 @@ true: annot, bin_annot
 <lib/trace.ml{,i}>: for-pack(MProf)
 true: strict_sequence, warn(A-4-3-23-11)
 false: profile
+<unix/*> or <test/*>: link_rt
