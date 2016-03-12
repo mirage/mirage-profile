@@ -1,8 +1,8 @@
 # OASIS_START
-# DO NOT EDIT (digest: eea85f79baee8c7ce1e77d098f80f102)
+# DO NOT EDIT (digest: 268e1ba49677c0b2551423b8c07cbf75)
 version = "0.6.1"
 description = "Record trace data"
-requires = "lwt ocplib-endian.bigstring cstruct cstruct.syntax"
+requires = "lwt ocplib-endian.bigstring cstruct cstruct.ppx"
 archive(byte) = "mProf.cma"
 archive(byte, plugin) = "mProf.cma"
 archive(native) = "mProf.cmxa"
