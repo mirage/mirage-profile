@@ -55,17 +55,19 @@ module Packet = struct
   let magic = 0xc1fc1fc1l
   let uuid = "\x05\x88\x3b\x8d\x52\x1a\x48\x7b\xb3\x97\x45\x6a\xb1\x50\x68\x0c"
 
-  cstruct packet_header {
+  [%%cstruct
+  type packet_header = {
     (* Stream header, repeated for each packet *)
-    uint32_t magic;
-    uint8_t  uuid[16];
+    magic: uint32_t;
+    uuid:  uint8_t [@len 16];
 
     (* Packet header *)
-    uint32_t size;
-    uint16_t stream_packet_count;
-    uint16_t content_size_low;    (* 2x16 bit to avoid allocating an Int32 *)
-    uint16_t content_size_high;
-  } as little_endian
+    size: uint32_t;
+    stream_packet_count: uint16_t;
+    content_size_low: uint16_t;    (* 2x16 bit to avoid allocating an Int32 *)
+    content_size_high: uint16_t;
+  } [@@little_endian]
+  ]
   let () =
     ignore (copy_packet_header_uuid, hexdump_packet_header, blit_packet_header_uuid)
 
