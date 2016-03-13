@@ -1,6 +1,6 @@
 OASISFormat: 0.4
 Name:        mirage-profile
-Version:     0.6.1
+Version:     0.7.0
 Synopsis:    Record trace data
 Authors:     Thomas Leonard
 License:     BSD-2-clause
