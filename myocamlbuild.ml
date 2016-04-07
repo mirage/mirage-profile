@@ -634,9 +634,11 @@ let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 (* OASIS_STOP *)
 
 (* Copied from mtime *)
+(* The "--no-as-needed" thing seems to be required on Ubuntu 12.04.
+   See: https://github.com/mirage/mirage-skeleton/pull/135 *)
 let os = Ocamlbuild_pack.My_unix.run_and_read "uname -s"
 let system_support_lib = match os with
-| "Linux\n" -> [A "-cclib"; A "-lrt"]
+| "Linux\n" -> [A "-cclib"; A "-Wl,--no-as-needed"; A "-cclib"; A "-lrt"]
 | _ -> []
 
 let () =
