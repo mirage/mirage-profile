@@ -27,7 +27,7 @@ let test ~name fn =
     | i -> fn () >>= fun () -> aux (i -1) in
   let n = 1000000 in
   let t0 = Unix.gettimeofday () in
-  Lwt_unix.run (aux n);
+  Lwt_main.run (aux n);
   let t1 = Unix.gettimeofday () in
   let time = t1 -. t0 in
   Printf.printf "%s: %f ns/run\n" name (1_000_000_000. *. time /. float_of_int n)
