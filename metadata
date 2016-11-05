@@ -31,6 +31,7 @@ enum thread_type : uint8_t {
 	On_termination = 11,
 	On_any = 12,
 	Ignore_result = 13,
+	Async = 14,
 };
 
 struct event_header {
