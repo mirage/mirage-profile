@@ -44,6 +44,7 @@ let int_of_thread_type t =
   | On_termination -> 11
   | On_any -> 12
   | Ignore_result -> 13
+  | Async -> 14
   | _ ->
       if not !did_warn_types then (
         Printf.eprintf "Warning: unknown thread type!\n%!";
