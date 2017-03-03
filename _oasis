@@ -15,8 +15,8 @@ Library "mProf"
   CompiledObject: native
   Path:		lib
   FindlibName: 	mirage-profile
-  Pack:		true
-  Modules: 	Trace, Counter
+  Modules: 	MProf
+  InternalModules: 	MProf_trace, MProf_counter
   BuildDepends: lwt,ocplib-endian.bigstring,cstruct (>= 1.9.0),cstruct.ppx
 
 Library "mProf_unix"

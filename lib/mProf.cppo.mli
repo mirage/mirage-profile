@@ -1,5 +1,7 @@
 (* Copyright (C) 2014, Thomas Leonard *)
 
+module Trace : sig 
+
 (** Functions that libraries can use to add events to the trace.
  *
  * If mirage-profile is compiled with tracing disabled, these are null-ops (or
@@ -74,3 +76,21 @@ module Control : sig
 end
 
 #endif
+
+end
+
+module Counter :sig 
+(** A counter or other time-varying integer value. *)
+
+type t
+
+val create : ?init:int -> name:string -> unit -> t
+val make : name:string -> t
+
+val value : t -> int
+val set_value : t -> int -> unit
+
+val increase : t -> int -> unit
+(** Record a change in the value of the metric. The change can be negative. *)
+
+end

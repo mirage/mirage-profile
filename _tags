@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 243c8bd95736b670447eb4e7bae5df4f)
+# DO NOT EDIT (digest: ab87865485814dd7af35ed493c1a272e)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -16,7 +16,6 @@ true: annot, bin_annot
 "_darcs": not_hygienic
 # Library mProf
 "lib/mProf.cmxs": use_mProf
-"lib/counter.cmx": for-pack(MProf)
 <lib/*.ml{,i,y}>: pkg_cstruct
 <lib/*.ml{,i,y}>: pkg_cstruct.ppx
 <lib/*.ml{,i,y}>: pkg_lwt

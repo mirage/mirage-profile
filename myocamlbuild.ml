@@ -935,7 +935,7 @@ let cppo_rules use_tracing ext =
   rule ("cppo: **/*.cppo."-.-ext^" -> **/*."-.-ext)  ~dep ~prod:prod2 (cppo_rule prod2)
 
 let dispatcher_cppo use_tracing =
-      List.iter (cppo_rules use_tracing) ["ml"; "mli"; "mlpack"]
+      List.iter (cppo_rules use_tracing) ["ml"; "mli"]
 
 let () =
   Ocamlbuild_plugin.dispatch (fun e ->
