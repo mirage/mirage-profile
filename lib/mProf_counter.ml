@@ -10,7 +10,7 @@ let make ~name = create ~name ()
 
 let set_value m v =
   m.value <- v;
-  Trace.note_counter_value m.name v
+  MProf_trace.note_counter_value m.name v
 
 let increase m amount =
   set_value m (m.value + amount)

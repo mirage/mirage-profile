@@ -1,33 +1,30 @@
-# OASIS_START
-# DO NOT EDIT (digest: 268e1ba49677c0b2551423b8c07cbf75)
-version = "0.6.1"
+version = "%%VERSION_NUM%%"
 description = "Record trace data"
 requires = "lwt ocplib-endian.bigstring cstruct cstruct.ppx"
 archive(byte) = "mProf.cma"
-archive(byte, plugin) = "mProf.cma"
+plugin(byte) = "mProf.cma"
 archive(native) = "mProf.cmxa"
-archive(native, plugin) = "mProf.cmxs"
+plugin(native) = "mProf.cmxs"
 exists_if = "mProf.cmxa"
 package "xen" (
- version = "0.6.1"
+ version = "%%VERSION_NUM%%"
  description = "Record trace data"
  requires = "mirage-profile io-page"
  archive(byte) = "mProf_xen.cma"
- archive(byte, plugin) = "mProf_xen.cma"
+ plugin(byte) = "mProf_xen.cma"
  archive(native) = "mProf_xen.cmxa"
- archive(native, plugin) = "mProf_xen.cmxs"
+ plugin(native) = "mProf_xen.cmxs"
  exists_if = "mProf_xen.cma"
 )
 
 package "unix" (
- version = "0.6.1"
+ version = "%%VERSION_NUM%%"
  description = "Record trace data"
  requires = "mirage-profile"
  archive(byte) = "mProf_unix.cma"
- archive(byte, plugin) = "mProf_unix.cma"
+ plugin(byte) = "mProf_unix.cma"
  archive(native) = "mProf_unix.cmxa"
- archive(native, plugin) = "mProf_unix.cmxs"
+ plugin(native) = "mProf_unix.cmxs"
  exists_if = "mProf_unix.cma"
 )
-# OASIS_STOP
 
