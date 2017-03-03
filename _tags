@@ -4,4 +4,4 @@ true: package(cstruct, cstruct.ppx, lwt, ocplib-endian.bigstring)
 <lib/trace.ml{,i}>: for-pack(MProf)
 true: strict_sequence, warn(A-4-3-23-11)
 false: profile
-<unix/*> or <test/*>: link_rt
+<unix/*> or <test/*>: link_unix

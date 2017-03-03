@@ -39,8 +39,7 @@ let () =
         Printf.printf "lwt.tracing available: %b\n" use_tracing;
         ()
     | After_rules ->
-        flag ["link"; "link_rt"] (S system_support_lib);
-        flag ["link"; "link_rt"] (S system_support_lib);
+        flag ["link"; "link_unix"] (S [S system_support_lib ; A "-ltime_stubs"] );
         dispatcher_cppo use_tracing
     | _ -> ()
     end;
