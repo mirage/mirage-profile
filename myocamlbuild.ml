@@ -1,3 +1,5 @@
+open Ocamlbuild_plugin
+
 (* Copied from mtime *)
 (* The "--no-as-needed" thing seems to be required on Ubuntu 12.04.
    See: https://github.com/mirage/mirage-skeleton/pull/135 *)
@@ -42,9 +44,4 @@ let () =
         dispatcher_cppo use_tracing
     | _ -> ()
     end;
-
-    (* Add pkg-config flags for MProf_xen *)
-
-    (* Apply default config *)
-    dispatch_default e
   )

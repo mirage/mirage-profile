@@ -18,4 +18,5 @@ let () =
     Pkg.mllib ~api:["MProf"] "lib/mProf.mllib" ; 
     Pkg.mllib ~cond:use_tracing "unix/mProf_unix.mllib" ; 
     Pkg.mllib ~cond:xen "xen/mProf_xen.mllib" ; 
+    Pkg.clib ~cond:use_tracing "unix/lib_time_stubs.clib"
   ]
