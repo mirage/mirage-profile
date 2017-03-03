@@ -1,5 +1,3 @@
-# OASIS_START
-# DO NOT EDIT (digest: 54f4b4f0e67489696aeea48c779be433)
 version = "0.7.0"
 description = "Record trace data"
 requires = "lwt ocplib-endian.bigstring cstruct cstruct.ppx"
@@ -29,5 +27,4 @@ package "unix" (
  archive(native, plugin) = "mProf_unix.cmxs"
  exists_if = "mProf_unix.cma"
 )
-# OASIS_STOP
 
