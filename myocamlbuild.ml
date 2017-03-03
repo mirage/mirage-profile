@@ -940,7 +940,7 @@ let dispatcher_cppo use_tracing =
 let () =
   Ocamlbuild_plugin.dispatch (fun e ->
     (* Detect whether lwt.tracing is available. *)
-    let use_tracing = 
+    let use_tracing =
       match Unix.system("ocamlfind query lwt.tracing > /dev/null 2>&1") with
       | Unix.WEXITED 0 -> true
       | Unix.WEXITED _ -> false
