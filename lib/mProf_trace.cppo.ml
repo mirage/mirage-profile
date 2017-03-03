@@ -1,5 +1,6 @@
 (* Copyright (C) 2014, Thomas Leonard *)
 
+#ifdef USE_TRACING
 (** This is the [Trace] module when we're compiled with tracing support.
  *
  * Note: we expect some kind of logger to process the trace buffer to collect
@@ -396,3 +397,28 @@ let should_resolve thread =
   match !Control.event_log with
   | None -> ()
   | Some log -> Control.note_label log (Lwt.id_of_thread thread) "__should_resolve" (* Hack! *)
+
+
+#else
+(** This is the [Trace] module when we're compiled without tracing support. *)
+
+type hiatus_reason =
+  | Wait_for_work
+  | Suspend
+  | Hibernate
+
+let note_hiatus _reason = ()
+let note_resume () = ()
+
+let label _label = ()
+let named_wait _label = Lwt.wait ()
+let named_task _label = Lwt.task ()
+let named_condition _label = Lwt_condition.create ()
+let named_mvar _label v = Lwt_mvar.create v
+let named_mvar_empty _label = Lwt_mvar.create_empty ()
+let should_resolve _thread = ()
+
+let note_increase _counter _amount = ()
+let note_counter_value _counter _value = ()
+
+#endif

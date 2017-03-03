@@ -1,5 +1,7 @@
 (* Copyright (C) 2014, Thomas Leonard *)
 
+module Trace : sig 
+
 (** Functions that libraries can use to add events to the trace.
  *
  * If mirage-profile is compiled with tracing disabled, these are null-ops (or
@@ -50,3 +52,45 @@ val note_hiatus : hiatus_reason -> unit
 
 val note_resume : unit -> unit
 (** Record that the program has just resumed running. *)
+
+#ifdef USE_TRACING
+(** The extended profiling interface available when compiled with tracing enabled. *)
+
+open Bigarray
+type log_buffer = (char, int8_unsigned_elt, c_layout) Array1.t
+
+type timestamper = log_buffer -> int -> unit
+
+module Control : sig
+  type t
+
+  val make : log_buffer -> timestamper -> t
+  (** Create a new trace log, backed by the given array.
+   * Use [MProf_unix] or [MProf_xen] to get the buffer and timestamper. *)
+
+  val start : t -> unit
+  (** Start logging to the given buffer. *)
+
+  val stop : t -> unit
+  (** Stop recording. *)
+end
+
+#endif
+
+end
+
+module Counter :sig 
+(** A counter or other time-varying integer value. *)
+
+type t
+
+val create : ?init:int -> name:string -> unit -> t
+val make : name:string -> t
+
+val value : t -> int
+val set_value : t -> int -> unit
+
+val increase : t -> int -> unit
+(** Record a change in the value of the metric. The change can be negative. *)
+
+end
