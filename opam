@@ -24,6 +24,7 @@ depends: [
   "io-page"
   "lwt"
   "ocamlbuild" {build}
+  "cppo" {build}
 ]
 depopts: [
 	"mirage-xen-minios"

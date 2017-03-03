@@ -1,64 +1,6 @@
-# OASIS_START
-# DO NOT EDIT (digest: ab87865485814dd7af35ed493c1a272e)
-# Ignore VCS directories, you can use the same kind of rule outside
-# OASIS_START/STOP if you want to exclude directories that contains
-# useless stuff for the build process
 true: annot, bin_annot
-<**/.svn>: -traverse
-<**/.svn>: not_hygienic
-".bzr": -traverse
-".bzr": not_hygienic
-".hg": -traverse
-".hg": not_hygienic
-".git": -traverse
-".git": not_hygienic
-"_darcs": -traverse
-"_darcs": not_hygienic
-# Library mProf
-"lib/mProf.cmxs": use_mProf
-<lib/*.ml{,i,y}>: pkg_cstruct
-<lib/*.ml{,i,y}>: pkg_cstruct.ppx
-<lib/*.ml{,i,y}>: pkg_lwt
-<lib/*.ml{,i,y}>: pkg_ocplib-endian.bigstring
-# Library mProf_unix
-"unix/mProf_unix.cmxs": use_mProf_unix
-<unix/*.ml{,i,y}>: oasis_library_mprof_unix_ccopt
-"unix/time_stubs.c": oasis_library_mprof_unix_ccopt
-<unix/mProf_unix.{cma,cmxa}>: use_libmProf_unix_stubs
-<unix/*.ml{,i,y}>: pkg_cstruct
-<unix/*.ml{,i,y}>: pkg_cstruct.ppx
-<unix/*.ml{,i,y}>: pkg_lwt
-<unix/*.ml{,i,y}>: pkg_ocplib-endian.bigstring
-<unix/*.ml{,i,y}>: use_mProf
-"unix/time_stubs.c": pkg_cstruct
-"unix/time_stubs.c": pkg_cstruct.ppx
-"unix/time_stubs.c": pkg_lwt
-"unix/time_stubs.c": pkg_ocplib-endian.bigstring
-"unix/time_stubs.c": use_mProf
-# Library mProf_xen
-"xen/mProf_xen.cmxs": use_mProf_xen
-<xen/*.ml{,i,y}>: pkg_cstruct
-<xen/*.ml{,i,y}>: pkg_cstruct.ppx
-<xen/*.ml{,i,y}>: pkg_io-page
-<xen/*.ml{,i,y}>: pkg_lwt
-<xen/*.ml{,i,y}>: pkg_ocplib-endian.bigstring
-<xen/*.ml{,i,y}>: use_mProf
-# Executable benchmark_test
-"test/benchmark.native": pkg_cstruct
-"test/benchmark.native": pkg_cstruct.ppx
-"test/benchmark.native": pkg_lwt
-"test/benchmark.native": pkg_lwt.unix
-"test/benchmark.native": pkg_ocplib-endian.bigstring
-"test/benchmark.native": use_mProf
-"test/benchmark.native": use_mProf_unix
-<test/*.ml{,i,y}>: pkg_cstruct
-<test/*.ml{,i,y}>: pkg_cstruct.ppx
-<test/*.ml{,i,y}>: pkg_lwt
-<test/*.ml{,i,y}>: pkg_lwt.unix
-<test/*.ml{,i,y}>: pkg_ocplib-endian.bigstring
-<test/*.ml{,i,y}>: use_mProf
-<test/*.ml{,i,y}>: use_mProf_unix
-# OASIS_STOP
+true: package(cstruct, cstruct.ppx, lwt, ocplib-endian.bigstring)
+<xen/*.ml{,i,y}>: package(io-page)
 <lib/trace.ml{,i}>: for-pack(MProf)
 true: strict_sequence, warn(A-4-3-23-11)
 false: profile
