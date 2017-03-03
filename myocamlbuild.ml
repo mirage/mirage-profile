@@ -935,19 +935,16 @@ let cppo_rules use_tracing ext =
   rule ("cppo: **/*.cppo."-.-ext^" -> **/*."-.-ext)  ~dep ~prod:prod2 (cppo_rule prod2)
 
 let dispatcher_cppo use_tracing =
-      dep ["ocaml"; "config"] ["lib/trace_stubs.ml";"lib/trace_stubs.mli";"lib/trace_enabled.ml";"lib/trace_enabled.mli"];
       List.iter (cppo_rules use_tracing) ["ml"; "mli"; "mlpack"]
 
 let () =
   Ocamlbuild_plugin.dispatch (fun e ->
     (* Detect whether lwt.tracing is available. *)
-    let use_tracing = bool_of_string (Sys.getenv "TRACING") in
-    (*
+    let use_tracing = 
       match Unix.system("ocamlfind query lwt.tracing > /dev/null 2>&1") with
       | Unix.WEXITED 0 -> true
       | Unix.WEXITED _ -> false
       | _ -> failwith "ocamlfind failed!" in
-    *)
     begin match e with
     | Before_options ->
         Printf.printf "lwt.tracing available: %b\n" use_tracing;

@@ -64,4 +64,3 @@ true: annot, bin_annot
 true: strict_sequence, warn(A-4-3-23-11)
 false: profile
 <unix/*> or <test/*>: link_rt
-<lib/trace.*> : config
