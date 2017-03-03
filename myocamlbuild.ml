@@ -936,21 +936,7 @@ let cppo_rules use_tracing ext =
 
 let dispatcher_cppo use_tracing =
       dep ["ocaml"; "config"] ["lib/trace_stubs.ml";"lib/trace_stubs.mli";"lib/trace_enabled.ml";"lib/trace_enabled.mli"];
-      List.iter (cppo_rules use_tracing) ["ml"; "mli"; "mlpack"];
-      pflag ["cppo"] "cppo_D" (fun s -> S [A "-D"; A s]) ;
-      pflag ["cppo"] "cppo_U" (fun s -> S [A "-U"; A s]) ;
-      pflag ["cppo"] "cppo_I" (fun s ->
-        if Pathname.is_directory s then S [A "-I"; P s]
-        else S [A "-I"; P (Pathname.dirname s)]
-      ) ;
-      pdep ["cppo"] "cppo_I" (fun s ->
-        if Pathname.is_directory s then [] else [s]) ;
-      flag ["cppo"; "cppo_q"] (A "-q") ;
-      flag ["cppo"; "cppo_s"] (A "-s") ;
-      flag ["cppo"; "cppo_n"] (A "-n") ;
-      pflag ["cppo"] "cppo_x" (fun s -> S [A "-x"; A s]);
-      pflag ["cppo"] "cppo_V" (fun s -> S [A "-V"; A s]);
-      flag ["cppo"; "cppo_V_OCAML"] & S [A "-V"; A ("OCAML:" ^ Sys.ocaml_version)]
+      List.iter (cppo_rules use_tracing) ["ml"; "mli"; "mlpack"]
 
 let () =
   Ocamlbuild_plugin.dispatch (fun e ->
