@@ -29,7 +29,6 @@ ocamlfind query lwt.tracing
 
 echo Unix tracing
 ls -l `ocamlfind query mirage-profile`/*.a
-./configure --enable-tests
 make test
 
 opam install mirage-xen-minios
