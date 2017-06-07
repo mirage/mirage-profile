@@ -21,6 +21,5 @@ let () =
     Pkg.mllib ~cond:xen "xen/mProf_xen.mllib";
 
     Pkg.mllib ~cond:unix "unix/mProf_unix.mllib";
-    Pkg.clib ~cond:unix "unix/libtime_stubs.clib";
     Pkg.test ~cond:unix "test/benchmark";
   ]

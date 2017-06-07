@@ -20,11 +20,10 @@ package "xen" (
 package "unix" (
  version = "%%VERSION_NUM%%"
  description = "Record trace data"
- requires = "mirage-profile"
+ requires = "mirage-profile mtime.clock.os"
  archive(byte) = "mProf_unix.cma"
  plugin(byte) = "mProf_unix.cma"
  archive(native) = "mProf_unix.cmxa"
  plugin(native) = "mProf_unix.cmxs"
  exists_if = "mProf_unix.cma"
 )
-

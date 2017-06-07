@@ -1,13 +1,5 @@
 open Ocamlbuild_plugin
 
-(* Copied from mtime *)
-(* The "--no-as-needed" thing seems to be required on Ubuntu 12.04.
-   See: https://github.com/mirage/mirage-skeleton/pull/135 *)
-let os = Ocamlbuild_pack.My_unix.run_and_read "uname -s"
-let system_support_lib = match os with
-| "Linux\n" -> [A "-cclib"; A "-Wl,--no-as-needed"; A "-cclib"; A "-lrt"]
-| _ -> []
-
 (* Copied from cppo *)
 let cppo_rules use_tracing ext =
   let dep   = "%(name).cppo"-.-ext
@@ -39,8 +31,6 @@ let () =
         Printf.printf "lwt.tracing available: %b\n" use_tracing;
         ()
     | After_rules ->
-        flag ["link"; "link_unix"] (S [S system_support_lib ; A "-cclib"; A "-ltime_stubs"; A "-I" ; P "unix"] );
-        dep [ "link"; "link_unix"] ["unix/libtime_stubs.a"];
         dispatcher_cppo use_tracing
     | _ -> ()
     end;
