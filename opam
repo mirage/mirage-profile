@@ -17,6 +17,7 @@ build: [[
 depends: [
   "ocamlfind" {build}
   "cstruct" {>= "1.9.0"}
+  "ppx_cstruct" {build}
   "ocplib-endian"
   "io-page"
   "lwt"

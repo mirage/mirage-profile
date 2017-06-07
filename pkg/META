@@ -1,6 +1,6 @@
 version = "%%VERSION_NUM%%"
 description = "Record trace data"
-requires = "lwt ocplib-endian.bigstring cstruct cstruct.ppx"
+requires = "lwt ocplib-endian.bigstring cstruct"
 archive(byte) = "mProf.cma"
 plugin(byte) = "mProf.cma"
 archive(native) = "mProf.cmxa"
