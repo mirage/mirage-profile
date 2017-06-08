@@ -21,7 +21,7 @@ depends: [
   "ocplib-endian"
   "io-page"
   "lwt"
-  "mtime"
+  "mtime" {>= "1.0.0"}
   "ocamlbuild" {build}
   "cppo" {build}
   "topkg" {build}
