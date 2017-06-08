@@ -3,7 +3,9 @@
 open Bigarray
 type log_buffer = (char, int8_unsigned_elt, c_layout) Array1.t
 
-external timestamper : log_buffer -> int -> unit = "stub_mprof_get_monotonic_time"
+let timestamper log_buffer ofs =
+  let ns = Mtime.to_uint64_ns @@ Mtime_clock.now () in
+  EndianBigstring.LittleEndian.set_int64 log_buffer ofs ns
 
 let mmap_buffer ~size path =
   let fd = Unix.(openfile path [O_RDWR; O_CREAT; O_TRUNC] 0o644) in

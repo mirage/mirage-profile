@@ -1,18 +1,17 @@
-all: build
 
-XEN=false
-
-.PHONY: test doc build clean
+.PHONY: build clean test
 
 build:
-	ocaml pkg/pkg.ml build --with-xen ${XEN}
-
-doc:
-	topkg doc
+	jbuilder build @install --dev
 
 test:
-	ocaml pkg/pkg.ml build --with-xen ${XEN} --tests true
-	ocaml pkg/pkg.ml test
+	jbuilder runtest --dev
+
+install:
+	jbuilder install
+
+uninstall:
+	jbuilder uninstall
 
 clean:
 	rm -rf _build
