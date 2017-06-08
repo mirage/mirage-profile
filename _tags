@@ -1,9 +1,0 @@
-true: annot, bin_annot
-true: package(cstruct, cstruct.ppx, lwt, ocplib-endian.bigstring)
-<xen/*.ml{,i,y}>: package(io-page)
-true: strict_sequence, warn(A-4-3-23-11)
-false: profile
-<unix/*> or <test/*>: link_unix, package(lwt.unix), package(mtime.clock.os)
-<lib>: include
-<unix>: include
-<xen>: include
