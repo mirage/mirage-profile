@@ -1,4 +1,14 @@
 language: c
-script: bash -ex .travis-ci.sh
+sudo: false
+services:
+  - docker
+install: wget https://raw.githubusercontent.com/ocaml/ocaml-travisci-skeleton/master/.travis-docker.sh
+script: bash -ex ./.travis-docker.sh
 env:
-  - OCAML_VERSION=4.02.0
+  global:
+  - PINS="mirage-profile:. mirage-profile-unix:. mirage-profile-xen:."
+  matrix:
+  - PACKAGE="mirage-profile" DISTRO="debian-stable" OCAML_VERSION="4.02.3"
+  - PACKAGE="mirage-profile" DISTRO="debian-stable" OCAML_VERSION="4.02.3" PINS="mirage-profile:. lwt:git://github.com/mirage/lwt#tracing"
+  - PACKAGE="mirage-profile-unix" DISTRO="debian-stable" OCAML_VERSION="4.03.0" PINS="mirage-profile:. mirage-profile-unix:. lwt:git://github.com/mirage/lwt#tracing" POST_INSTALL_HOOK="jbuilder runtest"
+  - PACKAGE="mirage-profile-xen" DISTRO="debian-stable" OCAML_VERSION="4.02.3"
