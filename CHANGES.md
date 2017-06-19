@@ -1,4 +1,4 @@
-v008.8.1 2017-06-19
+v0.8.1 2017-06-19
 -----------------
 
 - update opam descriptions to correctly depend on io-page-xen
