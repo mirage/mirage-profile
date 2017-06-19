@@ -13,12 +13,10 @@ build: [
 ]
 
 depends: [
-  "ocamlfind" {build}
   "jbuilder"  {build & >="1.0+beta9"}
-  "cstruct" {>= "1.9.0"}
+  "cstruct" {>= "3.0.0"}
   "ppx_cstruct" {build}
   "ocplib-endian"
   "lwt"
-  "topkg" {build}
 ]
-available: [ ocaml-version >= "4.02.0" ]
+available: [ ocaml-version >= "4.03.0" ]

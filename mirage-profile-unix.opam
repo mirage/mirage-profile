@@ -13,10 +13,8 @@ build: [
 ]
 
 depends: [
-  "ocamlfind" {build}
   "jbuilder"  {build & >="1.0+beta9"}
-  "mirage-profile"
+  "mirage-profile" {>="0.8.0"}
   "mtime" {>= "1.0.0"}
-  "topkg" {build}
 ]
-available: [ ocaml-version >= "4.02.0" ]
+available: [ ocaml-version >= "4.03.0" ]
