@@ -13,10 +13,9 @@ build: [
 ]
 
 depends: [
-  "ocamlfind" {build}
   "jbuilder"  {build & >="1.0+beta9"}
-  "mirage-profile"
-  "io-page"
+  "mirage-profile" {>="0.8.0"}
+  "io-page-xen"
   "mirage-xen-minios"
 ]
-available: [ ocaml-version >= "4.02.0" ]
+available: [ ocaml-version >= "4.03.0" ]
