@@ -1,3 +1,5 @@
+## mirage-profile -- collect runtime profiling information in CTF format
+
 This library can be used to trace execution of OCaml/Lwt programs (such as Mirage unikernels) at the level of Lwt threads.
 The traces can be viewed using JavaScript or GTK viewers provided by [mirage-trace-viewer][] or processed by tools supporting the [Common Trace Format (CTF)][ctf].
 Some example traces can be found in the blog post [Visualising an Asynchronous Monad](http://roscidus.com/blog/blog/2014/10/27/visualising-an-asynchronous-monad/).
