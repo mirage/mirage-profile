@@ -1,7 +1,7 @@
 (library
   ((name mirage_profile)
    (public_name mirage-profile)
-   (libraries (cstruct lwt
+   (libraries (cstruct lwt ocplib-endian ocplib-endian.bigstring
      (select mProf_trace.ml from
       (lwt.tracing -> mProf_trace_with_tracing.ml)
       (!lwt.tracing -> mProf_trace_without_tracing.ml))
