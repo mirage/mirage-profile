@@ -1,3 +1,8 @@
+v0.8.2 2017-11-22
+-----------------
+
+- add ocplib-endian to jbuild rules to support cstruct >= 3.2.0
+
 v0.8.1 2017-06-19
 -----------------
 
