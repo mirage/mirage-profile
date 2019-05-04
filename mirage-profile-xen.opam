@@ -7,7 +7,7 @@ homepage: "https://github.com/mirage/mirage-profile"
 doc: "https://mirage.github.io/mirage-profile"
 bug-reports: "https://github.com/mirage/mirage-profile/issues"
 depends: [
-  "ocaml" {>= "4.03.0"}
+  "ocaml" {>= "4.04.0"}
   "dune" {build & >= "1.0"}
   "mirage-profile" {>= "0.8.0"}
   "io-page-xen"
