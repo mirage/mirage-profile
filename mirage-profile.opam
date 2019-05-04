@@ -8,12 +8,12 @@ doc: "https://mirage.github.io/mirage-profile"
 license: "BSD-2-clause"
 
 build: [
-  [ "jbuilder" "subst"] {pinned}
-  [ "jbuilder" "build" "-p" name "-j" jobs ]
+  [ "dune" "subst"] {pinned}
+  [ "dune" "build" "-p" name "-j" jobs ]
 ]
 
 depends: [
-  "jbuilder"  {build & >="1.0+beta9"}
+  "dune"  {build & >= "1.0"}
   "cstruct" {>= "3.0.0"}
   "ppx_cstruct" {build}
   "ocplib-endian"
