@@ -28,6 +28,11 @@ To trace a **Unix process**, use `MProf_unix.mmap_buffer` to write to an mmapped
       MProf.Trace.Control.start trace_config
 
 You'll also need to link with the `mirage-profile` and `mirage-profile-unix` libraries.
+e.g. with this `dune` file:
+
+    (executable
+      (name test)
+      (libraries mirage-profile mirage-profile-unix))
 
 To begin tracing a **Xen unikernel**, create a buffer and call `MProf.Trace.Control.start`:
 
