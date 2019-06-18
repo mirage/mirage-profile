@@ -49,6 +49,7 @@ let int_of_thread_type t =
         did_warn_types := true
       );
       99
+  [@@ocaml.warning "-11"]
 
 module Packet = struct
   let magic = 0xc1fc1fc1l
@@ -337,6 +338,7 @@ module Control = struct
       note_suspend = note_suspend log;
     });
     note_switch log ()
+  [@@ocaml.warning "-23"]
 
   let () =
     Callback.register "MProf.Trace.note_gc" note_gc

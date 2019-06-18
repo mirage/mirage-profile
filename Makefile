@@ -1,30 +1,22 @@
 
 .PHONY: build clean test
 
+# mirage-profile-xen depends on mirage-xen, which depends on
+# mirage-profile, so dune won't let us build it against our
+# local mirage-profile by default.
 build:
-	jbuilder build @install --dev
+	dune build -p mirage-profile @install
+	dune build -p mirage-profile-xen @install
+	dune build -p mirage-profile-unix @install
 
 test:
-	jbuilder runtest --dev
+	dune runtest
 
 install:
-	jbuilder install
+	dune install
 
 uninstall:
-	jbuilder uninstall
+	dune uninstall
 
 clean:
 	rm -rf _build
-
-REPO=../../mirage/opam-repository
-PACKAGES=$(REPO)/packages
-# until we have https://github.com/ocaml/opam-publish/issues/38
-pkg-%:
-	topkg opam pkg -n $*
-	mkdir -p $(PACKAGES)/$*
-	cp -r _build/$*.* $(PACKAGES)/$*/
-	cd $(PACKAGES) && git add $*
-
-PKGS=$(basename $(wildcard *.opam))
-opam-pkg:
-	$(MAKE) $(PKGS:%=pkg-%)

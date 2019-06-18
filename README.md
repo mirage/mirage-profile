@@ -16,7 +16,7 @@ See http://openmirage.org/wiki/profiling for instructions.
 
 To record traces you need to pin a version of Lwt with tracing support (this provides the `lwt.tracing` findlib module):
 
-    $ opam pin add lwt 'https://github.com/mirage/lwt.git#tracing'
+    $ opam pin add lwt.3.0 'https://github.com/mirage/lwt.git#tracing'
 
 This will cause mirage-profile and any programs using it to be recompiled with tracing enabled.
 
@@ -28,6 +28,11 @@ To trace a **Unix process**, use `MProf_unix.mmap_buffer` to write to an mmapped
       MProf.Trace.Control.start trace_config
 
 You'll also need to link with the `mirage-profile` and `mirage-profile-unix` libraries.
+e.g. with this `dune` file:
+
+    (executable
+      (name test)
+      (libraries mirage-profile mirage-profile-unix))
 
 To begin tracing a **Xen unikernel**, create a buffer and call `MProf.Trace.Control.start`:
 
