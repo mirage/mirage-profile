@@ -1,3 +1,9 @@
+v0.9.0 2019-06-25
+-----------------
+
+- port to dune (@talex5)
+- upgrade opam metadata to 2.0 format (@talex5 @avsm)
+
 v0.8.2 2017-11-22
 -----------------
 
