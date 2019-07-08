@@ -14,7 +14,7 @@ depends: [
   "io-page"
   "mirage-xen-minios"
   "ocplib-endian"
-  "mirage-xen"
+  "mirage-xen" {>= "4.0.0"}
   "xenstore"
 ]
 build: [
