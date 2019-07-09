@@ -5,8 +5,8 @@ type log_buffer = (char, int8_unsigned_elt, c_layout) Array1.t
 
 external get_monotonic_time : unit -> int64 = "caml_get_monotonic_time"
 
-module Export = OS.Xen.Export
-module Xs = OS.Xs
+module Export = Os_xen.Xen.Export
+module Xs = Os_xen.Xs
 
 let timestamper buf off =
   EndianBigstring.LittleEndian.set_int64 buf off (get_monotonic_time ())
@@ -29,7 +29,7 @@ let share_with ~domid buffer =
   refs >>= fun refs ->
 
   let ring_ref = refs
-    |> List.map OS.Xen.Gntref.to_string
+    |> List.map Os_xen.Xen.Gntref.to_string
     |> String.concat "," in
 
   Xs.make ()
