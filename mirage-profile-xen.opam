@@ -14,11 +14,10 @@ depends: [
   "io-page"
   "mirage-xen-minios"
   "ocplib-endian"
-  "mirage-xen"
+  "mirage-xen" {>="3.3.0" & <"4.0.0"}
   "xenstore"
 ]
 build: [
-  ["dune" "subst"] {pinned}
   ["dune" "build" "-p" name "-j" jobs]
 ]
 dev-repo: "git+https://github.com/mirage/mirage-profile.git"
