@@ -11,6 +11,6 @@ env:
   matrix:
   - PACKAGE="mirage-profile" DISTRO="debian-stable" OCAML_VERSION="4.04"
   - PACKAGE="mirage-profile" DISTRO="debian-stable" OCAML_VERSION="4.05" PINS="mirage-profile:. lwt:git://github.com/mirage/lwt#tracing"
-  - PACKAGE="mirage-profile-unix" DISTRO="debian-stable" OCAML_VERSION="4.06" PINS="mirage-profile:. mirage-profile-unix:. lwt:git://github.com/mirage/lwt#tracing" POST_INSTALL_HOOK="jbuilder runtest"
+  - PACKAGE="mirage-profile-unix" DISTRO="debian-stable" OCAML_VERSION="4.06" PINS="mirage-profile:. mirage-profile-unix:. lwt:git://github.com/mirage/lwt#tracing" POST_INSTALL_HOOK="dune runtest"
   - PACKAGE="mirage-profile-xen" DISTRO="debian-stable" OCAML_VERSION="4.05"
   - PACKAGE="mirage-profile" DISTRO="debian-stable" OCAML_VERSION="4.05"
