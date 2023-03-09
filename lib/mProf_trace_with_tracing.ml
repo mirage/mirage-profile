@@ -55,21 +55,26 @@ module Packet = struct
   let magic = 0xc1fc1fc1l
   let uuid = "\x05\x88\x3b\x8d\x52\x1a\x48\x7b\xb3\x97\x45\x6a\xb1\x50\x68\x0c"
 
-  [%%cstruct
   type packet_header = {
     (* Stream header, repeated for each packet *)
-    magic: uint32_t;
-    uuid:  uint8_t [@len 16];
+    magic: Int32.t;
+    uuid:  string;
 
     (* Packet header *)
-    size: uint32_t;
-    stream_packet_count: uint16_t;
-    content_size_low: uint16_t;    (* 2x16 bit to avoid allocating an Int32 *)
-    content_size_high: uint16_t;
-  } [@@little_endian]
-  ]
-  let () =
-    ignore (copy_packet_header_uuid, hexdump_packet_header, blit_packet_header_uuid)
+    size: Int32.t;
+    stream_packet_count: int;
+    content_size_low: int;    (* 2x16 bit to avoid allocating an Int32 *)
+    content_size_high: int;
+  }
+
+  let sizeof_packet_header = 40
+
+  let magic_off = 0
+  let uuid_off = 4
+  let size_off = 20
+  let stream_packet_count_off = 24
+  let content_size_low_off = 26
+  let content_size_high_off = 28
 
   type t = {
     packet_start : int;
@@ -86,21 +91,21 @@ module Packet = struct
   let set_content_end packet content_end =
     let header = packet.header in
     let bits = (content_end - packet.packet_start) * 8 in
-    set_packet_header_content_size_low header (bits land 0xffff);
-    set_packet_header_content_size_high header (bits lsr 16)
+    Cstruct.LE.set_uint16 header content_size_low_off (bits land 0xffff);
+    Cstruct.LE.set_uint16 header content_size_high_off (bits lsr 16)
 
   let clear ~count packet =
     let bits = sizeof_packet_header * 8 in
     let header = packet.header in
-    set_packet_header_stream_packet_count header (count land 0xffff);
-    set_packet_header_content_size_low header (bits land 0xffff);
-    set_packet_header_content_size_high header (bits lsr 16)
+    Cstruct.LE.set_uint16 header stream_packet_count_off (count land 0xffff);
+    Cstruct.LE.set_uint16 header content_size_low_off (bits land 0xffff);
+    Cstruct.LE.set_uint16 header content_size_high_off (bits lsr 16)
 
   let make ~count ~off ~len buffer =
     let header = Cstruct.of_bigarray ~off ~len:sizeof_packet_header buffer in
-    set_packet_header_magic header magic;
-    set_packet_header_uuid uuid 0 header;
-    set_packet_header_size header (Int32.of_int (len * 8));
+    Cstruct.LE.set_uint32 header magic_off magic;
+    Cstruct.blit_from_string uuid 0 header uuid_off 16;
+    Cstruct.LE.set_uint32 header size_off (Int32.of_int (len * 8));
     let packet = {
       packet_start = off;
       header;
